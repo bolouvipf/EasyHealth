@@ -7,10 +7,11 @@ import { AuthService } from "./auth.service"
 import { AuthController } from "./auth.controller"
 import { JwtStrategy } from "./strategies/jwt.strategy"
 import { User } from "./user.entity"
+import { PasswordResetToken } from "./password-reset.entity"
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, PasswordResetToken]),
     PassportModule.register({ defaultStrategy: "jwt" }),
     JwtModule.registerAsync({
       imports: [ConfigModule],

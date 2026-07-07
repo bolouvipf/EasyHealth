@@ -3,6 +3,8 @@ import { ApiTags, ApiBearerAuth, ApiOperation } from "@nestjs/swagger"
 import { AuthService } from "./auth.service"
 import { RegisterDto } from "./dto/register.dto"
 import { LoginDto } from "./dto/login.dto"
+import { ForgotPasswordDto } from "./dto/forgot-password.dto"
+import { ResetPasswordDto } from "./dto/reset-password.dto"
 import { JwtAuthGuard } from "./guards/jwt-auth.guard"
 import { RolesGuard } from "./guards/roles.guard"
 import { Roles, UserRole } from "../common/decorators/roles.decorator"
@@ -35,6 +37,20 @@ export class AuthController {
   @ApiOperation({ summary: "Vérifier un compte professionnel (admin)" })
   verifyProfessional(@Param("id") id: string) {
     return this.authService.verifyProfessional(id)
+  }
+
+  @Public()
+  @Post("forgot-password")
+  @ApiOperation({ summary: "Demander un email de réinitialisation" })
+  forgotPassword(@Body() dto: ForgotPasswordDto) {
+    return this.authService.forgotPassword(dto.email)
+  }
+
+  @Public()
+  @Post("reset-password")
+  @ApiOperation({ summary: "Réinitialiser le mot de passe avec un token" })
+  resetPassword(@Body() dto: ResetPasswordDto) {
+    return this.authService.resetPassword(dto.token, dto.newPassword)
   }
 
   @UseGuards(JwtAuthGuard)
