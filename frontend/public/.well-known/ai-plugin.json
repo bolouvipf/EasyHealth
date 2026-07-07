@@ -1,0 +1,16 @@
+{
+  "schema_version": "v1",
+  "name_for_human": "EasyHealth DSE",
+  "name_for_model": "easyhealth_dse",
+  "description_for_human": "Dossier de Santé partagé pour le Bénin. Authentification requise.",
+  "description_for_model": "Plateforme de dossier de santé partagé pour le Bénin. Utilisez cette API pour interagir avec les dossiers patients, l'authentification et le partage sécurisé.",
+  "auth": {
+    "type": "bearer"
+  },
+  "api": {
+    "type": "openapi",
+    "url": "https://app.easyhealth.bj/api/docs-json"
+  },
+  "contact_email": "contact@easyhealth.bj",
+  "legal_info_url": "https://app.easyhealth.bj/legal"
+}

@@ -1,0 +1,5 @@
+# EasyHealth — Rapport de sécurité
+Contact: mailto:security@easyhealth.bj
+Expires: 2027-07-07T00:00:00.000Z
+Preferred-Languages: fr, en
+Canonical: https://app.easyhealth.bj/.well-known/security.txt

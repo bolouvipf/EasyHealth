@@ -1,0 +1,25 @@
+# EasyHealth — Guide IA
+> Dossier de Santé partagé (DSE) pour le Bénin.
+> Site web : https://app.easyhealth.bj
+
+## À propos
+EasyHealth est une plateforme de dossier de santé partagé connectant établissements publics et privés au Bénin autour d'un registre patient sécurisé, interopérable et conforme à l'APDP (Commission de Protection des Données du Bénin).
+
+## Stack technique
+- Backend : NestJS + TypeScript (API REST)
+- Base de données : PostgreSQL (TypeORM)
+- Frontend : React + Vite (TypeScript)
+- Auth : JWT + bcrypt, préparation Keycloak
+- Mobile : Flutter (P2)
+- Interopérabilité : HAPI FHIR (P1)
+
+## Pages principales
+- https://app.easyhealth.bj/ — Dashboard patients
+- https://app.easyhealth.bj/login — Connexion
+- https://app.easyhealth.bj/register — Inscription
+
+## Documentation technique
+Voir le dépôt GitHub ou le fichier DECISIONS.md pour l'architecture détaillée.
+
+## Contact
+Bénin — Projet opencode développé avec Opencode.

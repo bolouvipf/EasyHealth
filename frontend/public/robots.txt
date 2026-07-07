@@ -1,0 +1,45 @@
+# EasyHealth — Règles pour les robots
+# Site : https://app.easyhealth.bj
+# Langue : fr
+# Pays : BJ (Bénin)
+
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /login
+Disallow: /register
+Disallow: /admin
+Disallow: /*?*
+
+# Règles spécifiques aux IA (GPTBot, Claude, etc.)
+User-agent: GPTBot
+Allow: /
+Disallow: /api/
+Disallow: /login
+Disallow: /admin
+
+User-agent: Claude-Web
+Allow: /
+Disallow: /api/
+Disallow: /login
+Disallow: /admin
+
+User-agent: Google-Extended
+Allow: /
+Disallow: /api/
+Disallow: /login
+Disallow: /admin
+
+User-agent: CCBot
+Allow: /
+Disallow: /api/
+Disallow: /login
+Disallow: /admin
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /api/
+Disallow: /login
+Disallow: /admin
+
+Sitemap: https://app.easyhealth.bj/sitemap.xml
