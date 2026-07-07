@@ -1,3 +1,4 @@
+import "reflect-metadata"
 import { NestFactory } from "@nestjs/core"
 import { ValidationPipe, VersioningType } from "@nestjs/common"
 import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger"
@@ -7,11 +8,16 @@ import * as path from "path"
 import { AppModule } from "./app.module"
 
 async function bootstrap() {
+  process.on("uncaughtException", (err) => { console.error("UNCAUGHT", err); process.exit(1) })
+  process.on("unhandledRejection", (err) => { console.error("UNHANDLED", err) })
+
   const dbPath = process.env.DB_PATH || "./data/easyhealth.db"
   const dir = path.dirname(dbPath)
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true })
 
+  console.log("Starting NestFactory...")
   const app = await NestFactory.create(AppModule)
+  console.log("NestFactory created")
 
   app.setGlobalPrefix("api")
   app.enableVersioning({ type: VersioningType.URI, defaultVersion: "1" })
