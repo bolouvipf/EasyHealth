@@ -2,9 +2,15 @@ import { NestFactory } from "@nestjs/core"
 import { ValidationPipe, VersioningType } from "@nestjs/common"
 import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger"
 import helmet from "helmet"
+import * as fs from "fs"
+import * as path from "path"
 import { AppModule } from "./app.module"
 
 async function bootstrap() {
+  const dbPath = process.env.DB_PATH || "./data/easyhealth.db"
+  const dir = path.dirname(dbPath)
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true })
+
   const app = await NestFactory.create(AppModule)
 
   app.setGlobalPrefix("api")
