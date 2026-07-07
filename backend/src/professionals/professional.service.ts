@@ -1,0 +1,48 @@
+import { Injectable, NotFoundException } from "@nestjs/common"
+import { InjectRepository } from "@nestjs/typeorm"
+import { Repository } from "typeorm"
+import { ProfessionalVerification } from "./professional.entity"
+
+@Injectable()
+export class ProfessionalService {
+  constructor(
+    @InjectRepository(ProfessionalVerification)
+    private readonly verificationRepository: Repository<ProfessionalVerification>
+  ) {}
+
+  async createVerification(userId: string, licenseNumber: string, establishment?: string) {
+    const existing = await this.verificationRepository.findOne({ where: { userId } })
+    if (existing) return existing
+
+    const verification = this.verificationRepository.create({
+      userId,
+      licenseNumber,
+      establishment,
+      status: "pending",
+    })
+    return this.verificationRepository.save(verification)
+  }
+
+  async findPending() {
+    return this.verificationRepository.find({ where: { status: "pending" }, relations: ["user"] })
+  }
+
+  async verify(id: string, verifiedById: string) {
+    const verification = await this.verificationRepository.findOne({ where: { id }, relations: ["user"] })
+    if (!verification) throw new NotFoundException("Demande de vérification introuvable")
+
+    verification.status = "verified"
+    verification.verifiedAt = new Date()
+    verification.verifiedById = verifiedById
+    return this.verificationRepository.save(verification)
+  }
+
+  async reject(id: string, reason: string) {
+    const verification = await this.verificationRepository.findOne({ where: { id } })
+    if (!verification) throw new NotFoundException("Demande de vérification introuvable")
+
+    verification.status = "rejected"
+    verification.rejectionReason = reason
+    return this.verificationRepository.save(verification)
+  }
+}
