@@ -1,0 +1,49 @@
+{
+  "auth": {
+    "login_success": "Connexion réussie",
+    "register_success": "Inscription réussie",
+    "invalid_credentials": "Email ou mot de passe incorrect",
+    "account_disabled": "Compte désactivé",
+    "account_locked": "Compte verrouillé. Réessayez dans {minutes} minute(s)",
+    "professional_pending": "Compte professionnel en attente de vérification",
+    "email_taken": "Cet email est déjà utilisé",
+    "weak_password": "Mot de passe faible : {errors}",
+    "token_invalid": "Token invalide ou déjà utilisé",
+    "token_expired": "Token expiré",
+    "password_reset_success": "Mot de passe réinitialisé avec succès",
+    "forgot_password_sent": "Si cet email existe, un lien de réinitialisation a été envoyé",
+    "token_revoked": "Token révoqué",
+    "refresh_invalid": "Refresh token invalide",
+    "refresh_expired": "Refresh token expiré"
+  },
+  "patient": {
+    "not_found": "Dossier patient introuvable",
+    "not_found_active": "Dossier patient actif introuvable",
+    "forbidden_create": "Les patients ne peuvent pas créer de dossiers",
+    "forbidden_access": "Vous n'avez pas accès à ce dossier",
+    "forbidden_modify": "Vous n'avez pas les permissions pour modifier ce dossier",
+    "forbidden_modify_other": "Vous ne pouvez modifier que vos propres dossiers",
+    "deactivated": "Dossier désactivé avec succès"
+  },
+  "dashboard": {
+    "medecin": "Tableau de bord médecin",
+    "infirmier": "Tableau de bord infirmier",
+    "agent": "Patients suivis",
+    "administratif": "Vue administrative",
+    "patient": "Mon espace santé"
+  },
+  "common": {
+    "loading": "Chargement...",
+    "error": "Une erreur est survenue",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "create": "Créer",
+    "search": "Rechercher",
+    "no_data": "Aucune donnée disponible",
+    "back": "Retour",
+    "confirm": "Confirmer",
+    "logout": "Déconnexion"
+  }
+}

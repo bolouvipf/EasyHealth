@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react"
-import { auth as authApi } from "../services/api"
+import { auth as authApi, setStoredRefreshToken, setLogoutHandler } from "../services/api"
 import type { User } from "../types"
 
 interface AuthContextType {
@@ -8,10 +8,17 @@ interface AuthContextType {
   isLoading: boolean
   login: (email: string, password: string) => Promise<void>
   register: (data: any) => Promise<void>
-  logout: () => void
+  logout: () => Promise<void>
+  logoutAll: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
+
+let _logoutRedirect: (() => void) | null = null
+
+export function triggerLogout() {
+  _logoutRedirect?.()
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
@@ -28,32 +35,51 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(false)
   }, [])
 
-  const login = async (email: string, password: string) => {
-    const response = await authApi.login({ email, password })
-    localStorage.setItem("easyhealth_token", response.token)
-    localStorage.setItem("easyhealth_user", JSON.stringify(response.user))
-    setToken(response.token)
-    setUser(response.user)
-  }
-
-  const register = async (data: any) => {
-    const response = await authApi.register(data)
-    localStorage.setItem("easyhealth_token", response.token)
-    localStorage.setItem("easyhealth_user", JSON.stringify(response.user))
-    setToken(response.token)
-    setUser(response.user)
-  }
-
-  const logout = () => {
+  const doLogout = () => {
     localStorage.removeItem("easyhealth_token")
     localStorage.removeItem("easyhealth_user")
+    setStoredRefreshToken(null)
     setToken(null)
     setUser(null)
     window.location.href = "/login"
   }
 
+  useEffect(() => {
+    _logoutRedirect = doLogout
+    setLogoutHandler(doLogout)
+  }, [])
+
+  const login = async (email: string, password: string) => {
+    const response = await authApi.login({ email, password })
+    localStorage.setItem("easyhealth_token", response.accessToken)
+    localStorage.setItem("easyhealth_user", JSON.stringify(response.user))
+    setStoredRefreshToken(response.refreshToken)
+    setToken(response.accessToken)
+    setUser(response.user)
+  }
+
+  const register = async (data: any) => {
+    const response = await authApi.register(data)
+    localStorage.setItem("easyhealth_token", response.accessToken)
+    localStorage.setItem("easyhealth_user", JSON.stringify(response.user))
+    setStoredRefreshToken(response.refreshToken)
+    setToken(response.accessToken)
+    setUser(response.user)
+  }
+
+  const logout = async () => {
+    try { await authApi.logout("") } catch {}
+    setStoredRefreshToken(null)
+    doLogout()
+  }
+
+  const logoutAll = async () => {
+    try { await authApi.logoutAll() } catch {}
+    doLogout()
+  }
+
   return (
-    <AuthContext.Provider value={{ user, token, isLoading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, token, isLoading, login, register, logout, logoutAll }}>
       {children}
     </AuthContext.Provider>
   )

@@ -1,0 +1,51 @@
+services:
+  - type: web
+    name: easyhealth-api
+    env: node
+    buildCommand: npm install && npm run build
+    startCommand: npm run start:prod
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "3000"
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRATION
+        value: 15m
+      - key: DB_TYPE
+        value: postgres
+      - key: DB_HOST
+        fromDatabase:
+          name: easyhealth-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: easyhealth-db
+          property: port
+      - key: DB_USERNAME
+        fromDatabase:
+          name: easyhealth-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: easyhealth-db
+          property: password
+      - key: DB_DATABASE
+        fromDatabase:
+          name: easyhealth-db
+          property: database
+      - key: ENCRYPTION_KEY_V1
+        generateValue: true
+      - key: THROTTLE_TTL
+        value: "60"
+      - key: THROTTLE_LIMIT
+        value: "200"
+      - key: CORS_ORIGIN
+        value: https://easyhealth.vercel.app
+
+databases:
+  - name: easyhealth-db
+    plan: free
+    databaseType: postgres
+    ipAllowList: []

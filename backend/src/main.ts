@@ -7,15 +7,32 @@ import { AppModule } from "./app.module"
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
 
-  app.setGlobalPrefix("api/v1")
+  app.setGlobalPrefix("api")
   app.enableVersioning({ type: VersioningType.URI, defaultVersion: "1" })
 
   app.use(helmet())
+
+  const isProduction = process.env.NODE_ENV === "production"
+
+  const corsOrigin = isProduction
+    ? process.env.CORS_ORIGIN?.split(",") || ["https://easyhealth.vercel.app"]
+    : ["http://localhost:5173", "http://localhost:4173"]
+
   app.enableCors({
-    origin: process.env.NODE_ENV === "production" ? ["https://app.easyhealth.bj"] : "*",
+    origin: corsOrigin,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
   })
+
+  if (isProduction) {
+    app.use((req, res, next) => {
+      if (req.headers["x-forwarded-proto"] !== "https") {
+        return res.redirect(301, "https://" + req.headers.host + req.url)
+      }
+      next()
+    })
+  }
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -25,20 +42,22 @@ async function bootstrap() {
     })
   )
 
-  const config = new DocumentBuilder()
-    .setTitle("EasyHealth API")
-    .setDescription("API du Dossier de Santé partagé EasyHealth")
-    .setVersion("0.1.0")
-    .addBearerAuth()
-    .build()
+  if (!isProduction) {
+    const config = new DocumentBuilder()
+      .setTitle("EasyHealth API")
+      .setDescription("API du Dossier de Santé partagé EasyHealth")
+      .setVersion("0.1.0")
+      .addBearerAuth()
+      .build()
 
-  const document = SwaggerModule.createDocument(app, config)
-  SwaggerModule.setup("api/docs", app, document)
+    const document = SwaggerModule.createDocument(app, config)
+    SwaggerModule.setup("api/docs", app, document)
+    console.log(`Swagger docs: http://localhost:${process.env.PORT || 3000}/api/docs`)
+  }
 
   const port = process.env.PORT || 3000
   await app.listen(port)
   console.log(`EasyHealth API running on http://localhost:${port}`)
-  console.log(`Swagger docs: http://localhost:${port}/api/docs`)
 }
 
 bootstrap()

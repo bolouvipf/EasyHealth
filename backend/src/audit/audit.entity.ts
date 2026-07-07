@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   ManyToOne,
   JoinColumn,
+  BeforeUpdate,
 } from "typeorm"
 import { User } from "../auth/user.entity"
 import { PatientRecord } from "../patients/patient.entity"
@@ -49,4 +50,9 @@ export class AccessLog {
 
   @CreateDateColumn()
   createdAt: Date
+
+  @BeforeUpdate()
+  preventUpdate() {
+    throw new Error("Les logs d'audit sont immuables : modification interdite")
+  }
 }

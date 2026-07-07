@@ -11,6 +11,7 @@ interface JwtPayload {
   email: string
   role: string
   professionalStatus: string
+  tokenVersion: number
 }
 
 @Injectable()
@@ -20,16 +21,21 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>
   ) {
+    const secret = configService.get<string>("JWT_SECRET")
+    if (!secret) {
+      throw new Error("JWT_SECRET est obligatoire dans tous les environnements")
+    }
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: configService.get<string>("JWT_SECRET", "dev-secret"),
+      secretOrKey: secret,
     })
   }
 
   async validate(payload: JwtPayload) {
     const user = await this.userRepository.findOne({ where: { id: payload.sub } })
     if (!user || !user.isActive) throw new UnauthorizedException()
+    if (payload.tokenVersion !== user.tokenVersion) throw new UnauthorizedException("Token révoqué")
     return { sub: user.id, email: user.email, role: user.role, professionalStatus: user.professionalStatus }
   }
 }

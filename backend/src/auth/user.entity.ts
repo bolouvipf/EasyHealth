@@ -41,20 +41,32 @@ export class User {
   @Column({ nullable: true })
   professionalLicenseNumber: string
 
+  @Column({ nullable: true })
+  hospital: string
+
   @Column({ type: "simple-enum", enum: ["pending", "verified", "rejected"], default: "pending" })
   professionalStatus: ProfessionalStatus
 
   @Column({ default: true })
   isActive: boolean
 
-  @Column({ nullable: true })
-  consentDate: Date
+  @Column({ type: "datetime", nullable: true })
+  consentDate: Date | null
 
   @Column({ default: false })
   consentGiven: boolean
 
-  @Column({ nullable: true })
-  lastLoginAt: Date
+  @Column({ default: 0 })
+  failedLoginAttempts: number
+
+  @Column({ default: 0 })
+  tokenVersion: number
+
+  @Column({ type: "datetime", nullable: true })
+  lockedUntil: Date | null
+
+  @Column({ type: "datetime", nullable: true })
+  lastLoginAt: Date | null
 
   @CreateDateColumn()
   createdAt: Date
@@ -64,6 +76,9 @@ export class User {
 
   @OneToMany(() => PatientRecord, (record) => record.createdBy)
   createdRecords: PatientRecord[]
+
+  @OneToMany(() => PatientRecord, (record) => record.user)
+  patientRecords: PatientRecord[]
 
   @OneToMany(() => AccessLog, (log) => log.user)
   accessLogs: AccessLog[]

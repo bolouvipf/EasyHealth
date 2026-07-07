@@ -13,7 +13,7 @@ export default function RegisterPage() {
     setError("")
     try {
       await register(form)
-      navigate("/patients")
+      navigate("/dashboard")
     } catch (err: any) {
       setError(err.response?.data?.message || "Erreur d'inscription")
     }

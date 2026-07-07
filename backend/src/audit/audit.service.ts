@@ -45,4 +45,13 @@ export class AuditService {
       take: 100,
     })
   }
+
+  async findByPatientOwner(userId: string) {
+    return this.auditRepository.find({
+      where: { patientRecord: { createdById: userId } },
+      relations: ["user", "patientRecord"],
+      order: { createdAt: "DESC" },
+      take: 50,
+    })
+  }
 }

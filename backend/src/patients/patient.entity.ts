@@ -11,6 +11,7 @@ import {
 import { User } from "../auth/user.entity"
 import { AccessLog } from "../audit/audit.entity"
 import { SharingCode } from "../sharing/sharing.entity"
+import { ClinicalEntry } from "./clinical-entry.entity"
 
 @Entity("patient_records")
 export class PatientRecord {
@@ -41,21 +42,6 @@ export class PatientRecord {
   @Column({ nullable: true })
   profession: string
 
-  @Column({ type: "text", nullable: true })
-  allergies: string
-
-  @Column({ type: "text", nullable: true })
-  antecedentsMedicaux: string
-
-  @Column({ type: "text", nullable: true })
-  traitementsEnCours: string
-
-  @Column({ type: "text", nullable: true })
-  consultations: string
-
-  @Column({ type: "text", nullable: true })
-  notes: string
-
   @Column({ default: false })
   consentGiven: boolean
 
@@ -72,11 +58,21 @@ export class PatientRecord {
   @Column({ nullable: true })
   createdById: string
 
+  @ManyToOne(() => User, (user) => user.patientRecords)
+  @JoinColumn({ name: "user_id" })
+  user: User
+
+  @Column({ nullable: true })
+  userId: string
+
   @OneToMany(() => AccessLog, (log) => log.patientRecord)
   accessLogs: AccessLog[]
 
   @OneToMany(() => SharingCode, (code) => code.patientRecord)
   sharingCodes: SharingCode[]
+
+  @OneToMany(() => ClinicalEntry, (entry) => entry.patientRecord)
+  clinicalEntries: ClinicalEntry[]
 
   @CreateDateColumn()
   createdAt: Date

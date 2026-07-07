@@ -1,5 +1,6 @@
-import { Controller, Post, Body, Patch, Param, UseGuards } from "@nestjs/common"
+import { Controller, Post, Get, Body, Patch, Param, UseGuards, Req, Headers } from "@nestjs/common"
 import { ApiTags, ApiBearerAuth, ApiOperation } from "@nestjs/swagger"
+import { Throttle } from "@nestjs/throttler"
 import { AuthService } from "./auth.service"
 import { RegisterDto } from "./dto/register.dto"
 import { LoginDto } from "./dto/login.dto"
@@ -24,10 +25,36 @@ export class AuthController {
   }
 
   @Public()
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post("login")
   @ApiOperation({ summary: "Connexion" })
-  login(@Body() dto: LoginDto) {
-    return this.authService.login(dto)
+  login(@Body() dto: LoginDto, @Req() req: any) {
+    const ip = req.headers["x-forwarded-for"] || req.ip
+    return this.authService.login(dto, ip)
+  }
+
+  @Public()
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
+  @Post("refresh")
+  @ApiOperation({ summary: "Rafraîchir le token d'accès" })
+  refresh(@Body("refreshToken") refreshToken: string) {
+    return this.authService.refreshAccessToken(refreshToken)
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post("logout")
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Révoquer le refresh token" })
+  logout(@Body("refreshToken") refreshToken: string) {
+    return this.authService.logout(refreshToken)
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post("logout-all")
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Révoquer tous les tokens (force la reconnexion)" })
+  logoutAll(@CurrentUser() user: any) {
+    return this.authService.logoutAll(user.sub)
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -40,6 +67,7 @@ export class AuthController {
   }
 
   @Public()
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
   @Post("forgot-password")
   @ApiOperation({ summary: "Demander un email de réinitialisation" })
   forgotPassword(@Body() dto: ForgotPasswordDto) {
@@ -47,6 +75,7 @@ export class AuthController {
   }
 
   @Public()
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
   @Post("reset-password")
   @ApiOperation({ summary: "Réinitialiser le mot de passe avec un token" })
   resetPassword(@Body() dto: ResetPasswordDto) {
@@ -59,5 +88,34 @@ export class AuthController {
   @ApiOperation({ summary: "Récupérer le profil connecté" })
   getProfile(@CurrentUser() user: any) {
     return this.authService.findById(user.sub)
+  }
+
+  // --- Admin endpoints ---
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @Get("users")
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Lister tous les utilisateurs (admin)" })
+  findAllUsers() {
+    return this.authService.findAllUsers()
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @Patch("users/:id/toggle-active")
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Activer/désactiver un utilisateur (admin)" })
+  toggleUserActive(@Param("id") id: string) {
+    return this.authService.toggleUserActive(id)
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @Get("stats")
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Statistiques du tableau de bord (admin)" })
+  getStats() {
+    return this.authService.getStats()
   }
 }

@@ -1,0 +1,81 @@
+{
+  "nav": {
+    "home": "Home",
+    "patients": "Patients",
+    "audit": "Audit",
+    "admin": "Admin",
+    "logout": "Logout"
+  },
+  "landing": {
+    "hero_title": "Your health, shared with trust",
+    "hero_subtitle": "EasyHealth is the shared Health Record connecting patients and healthcare professionals in Benin.",
+    "cta_start": "Get started",
+    "cta_login": "Login",
+    "features_title": "Why EasyHealth?",
+    "feature1_title": "Enhanced security",
+    "feature1_desc": "End-to-end encrypted data, compliant with APDP standards.",
+    "feature2_title": "Accessible everywhere",
+    "feature2_desc": "View your records from any device, even in rural areas.",
+    "feature3_title": "Collaborative",
+    "feature3_desc": "Doctors, nurses and patients work together on one record.",
+    "footer": "© 2026 EasyHealth. All rights reserved."
+  },
+  "auth": {
+    "login_title": "Login",
+    "email": "Email",
+    "password": "Password",
+    "login_btn": "Login",
+    "register_link": "No account yet?",
+    "register_title": "Register",
+    "register_btn": "Register",
+    "login_link": "Already have an account?",
+    "forgot_password": "Forgot password?",
+    "forgot_title": "Reset password",
+    "forgot_btn": "Send",
+    "nom": "Last name",
+    "prenom": "First name",
+    "role": "Role"
+  },
+  "patient": {
+    "list_title": "Patient records",
+    "create_title": "New record",
+    "detail_title": "Patient record",
+    "entries_title": "Clinical entries",
+    "add_entry": "New entry",
+    "no_records": "No records found",
+    "no_entries": "No clinical entries",
+    "nom": "Last name",
+    "prenom": "First name",
+    "date_naissance": "Date of birth",
+    "telephone": "Phone",
+    "adresse": "Address",
+    "consent": "Consent",
+    "consent_granted": "✓ Consent",
+    "consent_denied": "✗ No consent"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "my_patients": "My patients",
+    "total_patients": "Total records",
+    "clinical_entries": "Clinical entries",
+    "recent": "Recent records",
+    "stats_today": "Created today",
+    "stats_active": "Active records",
+    "my_records": "My records",
+    "all_records": "All records",
+    "view_all": "View all"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "search": "Search",
+    "no_data": "No data available",
+    "back": "Back",
+    "confirm": "Confirm"
+  }
+}

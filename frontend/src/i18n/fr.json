@@ -1,0 +1,81 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "patients": "Patients",
+    "audit": "Audit",
+    "admin": "Admin",
+    "logout": "Déconnexion"
+  },
+  "landing": {
+    "hero_title": "Votre santé, partagée en toute confiance",
+    "hero_subtitle": "EasyHealth est le Dossier de Santé partagé qui connecte patients et professionnels de santé au Bénin.",
+    "cta_start": "Commencer",
+    "cta_login": "Se connecter",
+    "features_title": "Pourquoi EasyHealth ?",
+    "feature1_title": "Sécurité renforcée",
+    "feature1_desc": "Données chiffrées de bout en bout, conformes aux normes APDP.",
+    "feature2_title": "Accessible partout",
+    "feature2_desc": "Consultez vos dossiers depuis n'importe quel appareil, même en zone rurale.",
+    "feature3_title": "Collaboratif",
+    "feature3_desc": "Médecins, infirmiers et patients travaillent ensemble sur un même dossier.",
+    "footer": "© 2026 EasyHealth. Tous droits réservés."
+  },
+  "auth": {
+    "login_title": "Connexion",
+    "email": "Email",
+    "password": "Mot de passe",
+    "login_btn": "Se connecter",
+    "register_link": "Pas encore de compte ?",
+    "register_title": "Inscription",
+    "register_btn": "S'inscrire",
+    "login_link": "Déjà un compte ?",
+    "forgot_password": "Mot de passe oublié ?",
+    "forgot_title": "Réinitialisation",
+    "forgot_btn": "Envoyer",
+    "nom": "Nom",
+    "prenom": "Prénom",
+    "role": "Rôle"
+  },
+  "patient": {
+    "list_title": "Dossiers patients",
+    "create_title": "Nouveau dossier",
+    "detail_title": "Dossier patient",
+    "entries_title": "Entrées cliniques",
+    "add_entry": "Nouvelle entrée",
+    "no_records": "Aucun dossier trouvé",
+    "no_entries": "Aucune entrée clinique",
+    "nom": "Nom",
+    "prenom": "Prénom",
+    "date_naissance": "Date de naissance",
+    "telephone": "Téléphone",
+    "adresse": "Adresse",
+    "consent": "Consentement",
+    "consent_granted": "✓ Consentement",
+    "consent_denied": "✗ Pas de consentement"
+  },
+  "dashboard": {
+    "title": "Tableau de bord",
+    "my_patients": "Mes patients",
+    "total_patients": "Total dossiers",
+    "clinical_entries": "Entrées cliniques",
+    "recent": "Dossiers récents",
+    "stats_today": "Créés aujourd'hui",
+    "stats_active": "Dossiers actifs",
+    "my_records": "Mes dossiers",
+    "all_records": "Tous les dossiers",
+    "view_all": "Voir tous"
+  },
+  "common": {
+    "loading": "Chargement...",
+    "error": "Une erreur est survenue",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "create": "Créer",
+    "search": "Rechercher",
+    "no_data": "Aucune donnée disponible",
+    "back": "Retour",
+    "confirm": "Confirmer"
+  }
+}

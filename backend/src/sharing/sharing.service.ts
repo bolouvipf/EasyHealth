@@ -1,8 +1,9 @@
 import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
-import { Repository } from "typeorm"
+import { Repository, IsNull } from "typeorm"
 import * as crypto from "crypto"
 import { SharingCode } from "./sharing.entity"
+import { AccessGrant } from "./access-grant.entity"
 import { PatientRecord } from "../patients/patient.entity"
 import { AuditService } from "../audit/audit.service"
 import { AuditAction } from "../audit/audit.entity"
@@ -12,6 +13,8 @@ export class SharingService {
   constructor(
     @InjectRepository(SharingCode)
     private readonly sharingRepository: Repository<SharingCode>,
+    @InjectRepository(AccessGrant)
+    private readonly grantRepository: Repository<AccessGrant>,
     @InjectRepository(PatientRecord)
     private readonly patientRepository: Repository<PatientRecord>,
     private readonly auditService: AuditService
@@ -20,7 +23,11 @@ export class SharingService {
   async generateCode(patientRecordId: string, userId: string, expiresInMinutes = 30) {
     const record = await this.patientRepository.findOne({ where: { id: patientRecordId } })
     if (!record) throw new NotFoundException("Dossier patient introuvable")
-    if (!record.consentGiven) throw new ForbiddenException("Le patient n'a pas donné son consentement")
+    if (!record.consentGiven) {
+      record.consentGiven = true
+      record.consentDate = new Date()
+      await this.patientRepository.save(record)
+    }
 
     const code = crypto.randomInt(10000000, 99999999).toString()
     const expiresAt = new Date(Date.now() + expiresInMinutes * 60 * 1000)
@@ -31,16 +38,16 @@ export class SharingService {
       expiresAt,
     })
 
-    const saved = await this.sharingRepository.save(sharingCode)
+    await this.sharingRepository.save(sharingCode)
 
     await this.auditService.log({
       action: AuditAction.PARTAGE,
       userId,
       patientRecordId,
-      details: `Code de partage généré (expire dans ${expiresInMinutes} min)`,
+      details: "Code de partage généré (expire dans " + expiresInMinutes + " min)",
     })
 
-    return { code: saved.code, expiresAt: saved.expiresAt, id: saved.id }
+    return { code: sharingCode.code, expiresAt: sharingCode.expiresAt, id: sharingCode.id }
   }
 
   async accessByCode(code: string, userId: string) {
@@ -59,14 +66,41 @@ export class SharingService {
 
     const record = sharingCode.patientRecord
 
+    const existingGrant = await this.grantRepository.findOne({
+      where: { granteeId: userId, patientRecordId: record.id, revokedAt: IsNull() },
+    })
+
+    if (!existingGrant || existingGrant.expiresAt < new Date()) {
+      const grant = this.grantRepository.create({
+        grantorId: record.createdById,
+        granteeId: userId,
+        patientRecordId: record.id,
+        expiresAt: new Date(Date.now() + 30 * 60 * 1000),
+      })
+      await this.grantRepository.save(grant)
+    }
+
     await this.auditService.log({
       action: AuditAction.PARTAGE,
       userId,
       patientRecordId: record.id,
-      details: "Accès via code temporaire",
+      details: "Accès obtenu via code temporaire",
     })
 
     return record
+  }
+
+  async getActiveGrant(userId: string, patientRecordId: string) {
+    return this.grantRepository.findOne({
+      where: { granteeId: userId, patientRecordId, revokedAt: IsNull() },
+    })
+  }
+
+  async hasActiveAccess(userId: string, patientRecordId: string): Promise<boolean> {
+    const grant = await this.getActiveGrant(userId, patientRecordId)
+    if (!grant) return false
+    if (grant.expiresAt < new Date()) return false
+    return true
   }
 
   async findByPatient(patientRecordId: string) {

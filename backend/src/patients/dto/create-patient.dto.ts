@@ -40,21 +40,6 @@ export class CreatePatientDto {
   @IsString()
   profession?: string
 
-  @ApiPropertyOptional({ example: "Aucune" })
-  @IsOptional()
-  @IsString()
-  allergies?: string
-
-  @ApiPropertyOptional({ example: "Hypertension" })
-  @IsOptional()
-  @IsString()
-  antecedentsMedicaux?: string
-
-  @ApiPropertyOptional({ example: "Amlodipine 5mg" })
-  @IsOptional()
-  @IsString()
-  traitementsEnCours?: string
-
   @ApiPropertyOptional()
   @IsOptional()
   @IsBoolean()

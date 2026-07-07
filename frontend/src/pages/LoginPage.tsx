@@ -14,7 +14,7 @@ export default function LoginPage() {
     setError("")
     try {
       await login(email, password)
-      navigate("/patients")
+      navigate("/dashboard")
     } catch (err: any) {
       setError(err.response?.data?.message || "Erreur de connexion")
     }
@@ -37,6 +37,9 @@ export default function LoginPage() {
           </div>
           <button type="submit" className="btn btn-primary btn-block">Se connecter</button>
         </form>
+        <p className="auth-link">
+          <Link to="/forgot-password">Mot de passe oublié ?</Link>
+        </p>
         <p className="auth-link">
           Pas encore de compte ? <Link to="/register">S'inscrire</Link>
         </p>

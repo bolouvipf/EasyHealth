@@ -9,7 +9,9 @@ import { ProfessionalsModule } from "./professionals/professional.module"
 import { SharingModule } from "./sharing/sharing.module"
 import { AuditModule } from "./audit/audit.module"
 import { SyncModule } from "./sync/sync.module"
-
+import { EncryptionModule } from "./crypto/encryption.module"
+import { DashboardModule } from "./dashboard/dashboard.module"
+import { I18nModule } from "./i18n/i18n.module"
 
 @Module({
   imports: [
@@ -30,12 +32,15 @@ import { SyncModule } from "./sync/sync.module"
       }),
     }),
     ThrottlerModule.forRoot([{ ttl: 60000, limit: 100 }]),
+    EncryptionModule,
     AuthModule,
     PatientsModule,
     ProfessionalsModule,
     SharingModule,
     AuditModule,
     SyncModule,
+    DashboardModule,
+    I18nModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })

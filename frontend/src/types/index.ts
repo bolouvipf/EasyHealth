@@ -11,7 +11,7 @@ export interface User {
   professionalLicenseNumber?: string
   professionalStatus: ProfessionalStatus
   isActive: boolean
-  consentGiven: boolean
+  consentGiven?: boolean
 }
 
 export interface AuthResponse {
@@ -29,17 +29,25 @@ export interface PatientRecord {
   telephone?: string
   adresse?: string
   profession?: string
-  allergies?: string
-  antecedentsMedicaux?: string
-  traitementsEnCours?: string
-  consultations?: string
-  notes?: string
   consentGiven: boolean
-  isActive: boolean
   consentDate?: string
+  isActive: boolean
   createdById: string
+  clinicalEntries?: ClinicalEntry[]
   createdAt: string
   updatedAt: string
+}
+
+export interface ClinicalEntry {
+  id: string
+  patientRecordId: string
+  authorId?: string
+  entryType: string
+  content: string
+  metadata?: any
+  clientId?: string
+  createdAt: string
+  recordedAt?: string
 }
 
 export interface SharingCodeResponse {
@@ -51,10 +59,10 @@ export interface SharingCodeResponse {
 export interface AuditLog {
   id: string
   action: string
-  userId: string
+  userId?: string
   patientRecordId?: string
   details?: string
   ipAddress?: string
+  user?: { nom: string; prenom: string }
   createdAt: string
-  user?: User
 }

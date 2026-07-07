@@ -1,0 +1,49 @@
+{
+  "auth": {
+    "login_success": "Login successful",
+    "register_success": "Registration successful",
+    "invalid_credentials": "Invalid email or password",
+    "account_disabled": "Account disabled",
+    "account_locked": "Account locked. Try again in {minutes} minute(s)",
+    "professional_pending": "Professional account pending verification",
+    "email_taken": "This email is already in use",
+    "weak_password": "Weak password: {errors}",
+    "token_invalid": "Invalid or already used token",
+    "token_expired": "Token expired",
+    "password_reset_success": "Password reset successful",
+    "forgot_password_sent": "If this email exists, a reset link has been sent",
+    "token_revoked": "Token revoked",
+    "refresh_invalid": "Invalid refresh token",
+    "refresh_expired": "Refresh token expired"
+  },
+  "patient": {
+    "not_found": "Patient record not found",
+    "not_found_active": "Active patient record not found",
+    "forbidden_create": "Patients cannot create records",
+    "forbidden_access": "You do not have access to this record",
+    "forbidden_modify": "You do not have permission to modify this record",
+    "forbidden_modify_other": "You can only modify your own records",
+    "deactivated": "Record deactivated successfully"
+  },
+  "dashboard": {
+    "medecin": "Doctor dashboard",
+    "infirmier": "Nurse dashboard",
+    "agent": "Followed patients",
+    "administratif": "Admin view",
+    "patient": "My health space"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "search": "Search",
+    "no_data": "No data available",
+    "back": "Back",
+    "confirm": "Confirm",
+    "logout": "Logout"
+  }
+}
