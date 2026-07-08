@@ -6,9 +6,6 @@ export class PasswordResetToken {
   @PrimaryGeneratedColumn("uuid")
   id: string
 
-  @Column()
-  userId: string
-
   @ManyToOne(() => User)
   @JoinColumn({ name: "user_id" })
   user: User

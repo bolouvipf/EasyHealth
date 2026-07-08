@@ -5,6 +5,7 @@ import {
   ForbiddenException,
   BadRequestException,
   NotFoundException,
+  Logger,
 } from "@nestjs/common"
 import { JwtService } from "@nestjs/jwt"
 import { InjectRepository } from "@nestjs/typeorm"
@@ -29,6 +30,8 @@ const REFRESH_TOKEN_DAYS = 30
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name)
+
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
@@ -156,7 +159,7 @@ export class AuthService {
 
     if (user) {
       await this.resetTokenRepository.save(
-        this.resetTokenRepository.create({ userId: user.id, token: hashedToken, expiresAt })
+        this.resetTokenRepository.create({ user, token: hashedToken, expiresAt })
       )
       this.mailService.sendPasswordReset(email, rawToken)
     }
@@ -168,22 +171,26 @@ export class AuthService {
     this.validatePasswordComplexity(newPassword)
 
     const hashedToken = crypto.createHash("sha256").update(rawToken).digest("hex")
+    this.logger.log(`Looking up token hash: ${hashedToken.substring(0, 16)}...`)
     const resetToken = await this.resetTokenRepository.findOne({
       where: { token: hashedToken, isUsed: false },
       relations: ["user"],
     })
 
     if (!resetToken) throw new BadRequestException("Token invalide ou déjà utilisé")
+    this.logger.log(`Token found for user: ${resetToken.user?.id}`)
     if (new Date() > resetToken.expiresAt) throw new BadRequestException("Token expiré")
 
     resetToken.isUsed = true
     await this.resetTokenRepository.save(resetToken)
+    this.logger.log("Token marked as used")
 
     const salt = await bcrypt.genSalt(12)
     resetToken.user.password = await bcrypt.hash(newPassword, salt)
     resetToken.user.failedLoginAttempts = 0
     resetToken.user.lockedUntil = null
     await this.userRepository.save(resetToken.user)
+    this.logger.log("Password updated")
 
     return { message: "Mot de passe réinitialisé avec succès" }
   }
@@ -208,7 +215,7 @@ export class AuthService {
 
     await this.refreshTokenRepository.save(
       this.refreshTokenRepository.create({
-        userId: user.id,
+        user,
         tokenHash,
         expiresAt,
       })
@@ -246,7 +253,7 @@ export class AuthService {
   }
 
   async logoutAll(userId: string) {
-    await this.refreshTokenRepository.update({ userId, isRevoked: false }, { isRevoked: true })
+    await this.refreshTokenRepository.update({ user: { id: userId }, isRevoked: false }, { isRevoked: true })
     await this.userRepository.increment({ id: userId }, "tokenVersion", 1)
   }
 
