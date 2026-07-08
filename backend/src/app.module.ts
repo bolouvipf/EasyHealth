@@ -29,7 +29,7 @@ import { MailModule } from "./mail/mail.module"
         password: config.get<string>("DB_PASSWORD"),
         entities: [__dirname + "/**/*.entity{.ts,.js}"],
         subscribers: [],
-        synchronize: config.get<string>("NODE_ENV") !== "production",
+        synchronize: true,
       }),
     }),
     ThrottlerModule.forRoot([{ ttl: 60000, limit: 100 }]),
