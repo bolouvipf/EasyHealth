@@ -6,6 +6,7 @@ import LandingPage from "./pages/LandingPage"
 import LoginPage from "./pages/LoginPage"
 import RegisterPage from "./pages/RegisterPage"
 import ForgotPasswordPage from "./pages/ForgotPasswordPage"
+import ResetPasswordPage from "./pages/ResetPasswordPage"
 import DashboardPage from "./pages/DashboardPage"
 import PatientDashboard from "./pages/PatientDashboard"
 import PatientDetail from "./pages/PatientDetail"
@@ -44,7 +45,7 @@ function Navbar() {
 
 function App() {
   const location = useLocation()
-  const publicPaths = ["/", "/login", "/register", "/forgot-password"]
+  const publicPaths = ["/", "/login", "/register", "/forgot-password", "/reset-password"]
   const showNavbar = !publicPaths.includes(location.pathname)
 
   return (
@@ -57,6 +58,7 @@ function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
             <Route path="/patients" element={<ProtectedRoute><PatientDashboard /></ProtectedRoute>} />
             <Route path="/patients/:id" element={<ProtectedRoute roles={["medecin", "infirmier", "admin"]}><PatientDetail /></ProtectedRoute>} />

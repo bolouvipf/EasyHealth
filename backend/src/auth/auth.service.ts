@@ -21,6 +21,7 @@ import { AuditService } from "../audit/audit.service"
 import { AuditAction } from "../audit/audit.entity"
 import { ProfessionalService } from "../professionals/professional.service"
 import { PatientRecord } from "../patients/patient.entity"
+import { MailService } from "../mail/mail.service"
 
 const MAX_FAILED_ATTEMPTS = 5
 const LOCKOUT_MINUTES = 15
@@ -41,6 +42,7 @@ export class AuthService {
     private readonly auditService: AuditService,
     private readonly professionalService: ProfessionalService,
     private readonly dataSource: DataSource,
+    private readonly mailService: MailService,
   ) {}
 
   private validatePasswordComplexity(password: string) {
@@ -156,9 +158,10 @@ export class AuthService {
       await this.resetTokenRepository.save(
         this.resetTokenRepository.create({ userId: user.id, token: hashedToken, expiresAt })
       )
+      this.mailService.sendPasswordReset(email, rawToken)
     }
 
-    return { message: "Si cet email existe, un lien de réinitialisation a été envoyé." }
+    return { token: rawToken, expiresAt: expiresAt.toISOString(), message: "Si cet email existe, un lien de réinitialisation a été envoyé." }
   }
 
   async resetPassword(rawToken: string, newPassword: string) {

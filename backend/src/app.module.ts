@@ -12,6 +12,7 @@ import { SyncModule } from "./sync/sync.module"
 import { EncryptionModule } from "./crypto/encryption.module"
 import { DashboardModule } from "./dashboard/dashboard.module"
 import { I18nModule } from "./i18n/i18n.module"
+import { MailModule } from "./mail/mail.module"
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { I18nModule } from "./i18n/i18n.module"
     SyncModule,
     DashboardModule,
     I18nModule,
+    MailModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })

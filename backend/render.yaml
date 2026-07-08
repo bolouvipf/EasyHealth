@@ -42,7 +42,9 @@ services:
       - key: THROTTLE_LIMIT
         value: "200"
       - key: CORS_ORIGIN
-        value: https://easyhealth.vercel.app
+        value: https://easy-health-pierre-florent-bolouvi-s-projects.vercel.app,https://easy-health-wine.vercel.app
+      - key: FRONTEND_URL
+        value: https://easy-health-wine.vercel.app
 
 databases:
   - name: easyhealth-db
