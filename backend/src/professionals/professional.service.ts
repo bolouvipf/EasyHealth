@@ -27,11 +27,21 @@ export class ProfessionalService {
   }
 
   async findPending() {
-    return this.verificationRepository.find({ where: { status: "pending" }, relations: ["user"] })
+    const verifications = await this.verificationRepository.find({ where: { status: "pending" } })
+    const userIds = verifications.map((v) => v.userId)
+    if (userIds.length === 0) return []
+
+    const users = await this.userRepository.findByIds(userIds)
+    const userMap = new Map(users.map((u) => [u.id, u]))
+
+    return verifications.map((v) => ({
+      ...v,
+      user: userMap.get(v.userId) || null,
+    }))
   }
 
   async verify(id: string, verifiedById: string) {
-    const verification = await this.verificationRepository.findOne({ where: { id }, relations: ["user"] })
+    const verification = await this.verificationRepository.findOne({ where: { id } })
     if (!verification) throw new NotFoundException("Demande de vérification introuvable")
 
     verification.status = "verified"
@@ -39,26 +49,20 @@ export class ProfessionalService {
     verification.verifiedById = verifiedById
     await this.verificationRepository.save(verification)
 
-    if (verification.user) {
-      verification.user.professionalStatus = "verified"
-      await this.userRepository.save(verification.user)
-    }
+    await this.userRepository.update(verification.userId, { professionalStatus: "verified" })
 
     return verification
   }
 
   async reject(id: string, reason: string) {
-    const verification = await this.verificationRepository.findOne({ where: { id }, relations: ["user"] })
+    const verification = await this.verificationRepository.findOne({ where: { id } })
     if (!verification) throw new NotFoundException("Demande de vérification introuvable")
 
     verification.status = "rejected"
     verification.rejectionReason = reason
     await this.verificationRepository.save(verification)
 
-    if (verification.user) {
-      verification.user.professionalStatus = "rejected"
-      await this.userRepository.save(verification.user)
-    }
+    await this.userRepository.update(verification.userId, { professionalStatus: "rejected" })
 
     return verification
   }
