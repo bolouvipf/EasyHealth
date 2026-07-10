@@ -1,6 +1,6 @@
 import { Module, MiddlewareConsumer, NestModule } from "@nestjs/common"
 import { ConfigModule, ConfigService } from "@nestjs/config"
-import { TypeOrmModule } from "@nestjs/typeorm"
+import { TypeOrmModule, TypeOrmModuleOptions } from "@nestjs/typeorm"
 import { ThrottlerModule, ThrottlerGuard } from "@nestjs/throttler"
 import { APP_GUARD } from "@nestjs/core"
 import { AuthModule } from "./auth/auth.module"
@@ -20,17 +20,30 @@ import { MailModule } from "./mail/mail.module"
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        type: config.get<string>("DB_TYPE") === "postgres" ? "postgres" : "better-sqlite3",
-        database: config.get<string>("DB_PATH", "./data/easyhealth.db"),
-        host: config.get<string>("DB_HOST"),
-        port: config.get<number>("DB_PORT"),
-        username: config.get<string>("DB_USERNAME"),
-        password: config.get<string>("DB_PASSWORD"),
-        entities: [__dirname + "/**/*.entity{.ts,.js}"],
-        subscribers: [],
-        synchronize: true,
-      }),
+      useFactory: (config: ConfigService) => {
+        const databaseUrl = config.get<string>("DATABASE_URL")
+        if (databaseUrl) {
+          return {
+            type: "postgres" as const,
+            url: databaseUrl,
+            entities: [__dirname + "/**/*.entity{.ts,.js}"],
+            subscribers: [],
+            synchronize: true,
+            ssl: { rejectUnauthorized: false },
+          } as TypeOrmModuleOptions
+        }
+        return {
+          type: (config.get<string>("DB_TYPE") === "postgres" ? "postgres" : "better-sqlite3") as any,
+          database: config.get<string>("DB_PATH", "./data/easyhealth.db"),
+          host: config.get<string>("DB_HOST"),
+          port: config.get<number>("DB_PORT"),
+          username: config.get<string>("DB_USERNAME"),
+          password: config.get<string>("DB_PASSWORD"),
+          entities: [__dirname + "/**/*.entity{.ts,.js}"],
+          subscribers: [],
+          synchronize: true,
+        } as TypeOrmModuleOptions
+      },
     }),
     ThrottlerModule.forRoot([{ ttl: 60000, limit: 100 }]),
     EncryptionModule,
