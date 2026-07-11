@@ -5,6 +5,7 @@ import { ConfigModule, ConfigService } from "@nestjs/config"
 import { TypeOrmModule } from "@nestjs/typeorm"
 import { AuthService } from "./auth.service"
 import { AuthController } from "./auth.controller"
+import { AdminController } from "./admin.controller"
 import { JwtStrategy } from "./strategies/jwt.strategy"
 import { User } from "./user.entity"
 import { PasswordResetToken } from "./password-reset.entity"
@@ -34,7 +35,7 @@ import { ProfessionalsModule } from "../professionals/professional.module"
     AuditModule,
     ProfessionalsModule,
   ],
-  controllers: [AuthController],
+  controllers: [AuthController, AdminController],
   providers: [AuthService, JwtStrategy],
   exports: [AuthService, JwtModule, PassportModule],
 })

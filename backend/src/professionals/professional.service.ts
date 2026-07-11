@@ -24,6 +24,18 @@ export class ProfessionalService {
         return professional;
     }
 
+    async rejectProfessional(id: string, reason: string) {
+        const professional = await this.verificationRepository.findOne({ where: { id } });
+        if (!professional) throw new NotFoundException("Professionnel introuvable");
+
+        professional.status = "rejected";
+        professional.rejectionReason = reason;
+        await this.verificationRepository.save(professional);
+        await this.userRepository.update(professional.userId, { professionalStatus: "rejected" });
+
+        return professional;
+    }
+
     async activateProfessional(id: string, verifiedById: string) {
         const professional = await this.verificationRepository.findOne({ where: { id } });
         if (!professional) throw new NotFoundException("Professionnel introuvable");
