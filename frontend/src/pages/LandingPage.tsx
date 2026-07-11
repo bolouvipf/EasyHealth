@@ -463,8 +463,9 @@ function Footer() {
         </nav>
         <nav className="footer-col">
           <h4>Ressources</h4>
-          <a href="#">Documentation API</a>
+          <a href="https://easyhealth-api.onrender.com/api/v1/docs" target="_blank" rel="noreferrer">Documentation API</a>
           <Link to="/guide-patient">Guide patient</Link>
+          <Link to="/guide-pro">Guide professionnel</Link>
           <Link to="/faq">FAQ</Link>
         </nav>
         <nav className="footer-col">

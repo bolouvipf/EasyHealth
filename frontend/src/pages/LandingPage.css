@@ -594,9 +594,13 @@
   text-decoration: none;
   font-size: 14px;
   margin: 0 0 10px;
+  transition: color 0.15s ease;
 }
-.footer-col a:hover {
-  color: #fff;
+.footer-col a:hover,
+.footer-col a:focus-visible {
+  color: #ffffff;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 .footer-bottom {
   display: flex;

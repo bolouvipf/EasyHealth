@@ -19,6 +19,7 @@ import NotFoundPage from "./pages/NotFoundPage"
 import FaqPage from "./pages/FaqPage"
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage"
 import PatientGuidePage from "./pages/PatientGuidePage"
+import ProGuidePage from "./pages/ProGuidePage"
 
 function ProtectedRoute({ children, roles }: { children: React.ReactNode; roles?: string[] }) {
   const { user, isLoading } = useAuth()
@@ -102,7 +103,7 @@ function Navbar() {
 
 function App() {
   const location = useLocation()
-  const publicPaths = ["/", "/login", "/adminlogin", "/register", "/forgot-password", "/reset-password", "/faq", "/privacy", "/guide-patient"]
+  const publicPaths = ["/", "/login", "/adminlogin", "/register", "/forgot-password", "/reset-password", "/faq", "/privacy", "/guide-patient", "/guide-pro"]
   const showNavbar = !publicPaths.includes(location.pathname)
 
   return (
@@ -126,6 +127,7 @@ function App() {
             <Route path="/faq" element={<FaqPage />} />
             <Route path="/privacy" element={<PrivacyPolicyPage />} />
             <Route path="/guide-patient" element={<PatientGuidePage />} />
+            <Route path="/guide-pro" element={<ProGuidePage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </div>
