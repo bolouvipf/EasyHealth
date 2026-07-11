@@ -27,7 +27,12 @@ async function bootstrap() {
   const isProduction = process.env.NODE_ENV === "production"
 
   app.enableCors({
-    origin: isProduction ? true : ["http://localhost:5173", "http://localhost:4173"],
+    origin: isProduction
+      ? [
+          "https://easy-health-wine.vercel.app",
+          "https://easy-health-pierre-florent-bolouvi-s-projects.vercel.app",
+        ]
+      : ["http://localhost:5173", "http://localhost:4173"],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
