@@ -323,8 +323,23 @@ export class AuthService {
     if (secret !== "EASYHEALTH_ADMIN_RESET_2026") {
       throw new UnauthorizedException("Code secret invalide")
     }
-    const user = await this.userRepository.findOne({ where: { email: "admin@easyhealth.bj" } })
-    if (!user) throw new NotFoundException("Compte admin introuvable")
+
+    let user = await this.userRepository.findOne({ where: { email: "admin@easyhealth.bj" } })
+
+    if (!user) {
+      const salt = await bcrypt.genSalt(12)
+      user = this.userRepository.create({
+        email: "admin@easyhealth.bj",
+        password: await bcrypt.hash("Admin@2026!", salt),
+        nom: "Administrateur",
+        prenom: "EasyHealth",
+        role: UserRole.ADMIN,
+        professionalStatus: "verified",
+        isActive: true,
+      })
+      await this.userRepository.save(user)
+      return { message: "Compte admin créé avec succès" }
+    }
 
     const salt = await bcrypt.genSalt(12)
     user.password = await bcrypt.hash("Admin@2026!", salt)
