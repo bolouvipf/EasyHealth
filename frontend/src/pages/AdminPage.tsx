@@ -100,7 +100,7 @@ export default function AdminPage() {
   }
 
   return (
-    <div>
+    <div className="admin-shell">
       <div className="page-header">
         <div>
           <h1>Administration</h1>
