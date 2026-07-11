@@ -50,7 +50,7 @@ export class User {
   @Column({ default: true })
   isActive: boolean
 
-  @Column({ type: "datetime", nullable: true })
+  @Column({ type: "timestamp", nullable: true })
   consentDate: Date | null
 
   @Column({ default: false })
@@ -62,10 +62,10 @@ export class User {
   @Column({ default: 0 })
   tokenVersion: number
 
-  @Column({ type: "datetime", nullable: true })
+  @Column({ type: "timestamp", nullable: true })
   lockedUntil: Date | null
 
-  @Column({ type: "datetime", nullable: true })
+  @Column({ type: "timestamp", nullable: true })
   lastLoginAt: Date | null
 
   @CreateDateColumn()

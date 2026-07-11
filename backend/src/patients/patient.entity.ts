@@ -45,7 +45,7 @@ export class PatientRecord {
   @Column({ default: false })
   consentGiven: boolean
 
-  @Column({ nullable: true, type: "datetime" })
+  @Column({ nullable: true, type: "timestamp" })
   consentDate: Date | null
 
   @Column({ default: false })
