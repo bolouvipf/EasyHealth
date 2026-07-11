@@ -3,18 +3,28 @@ import { DataSource } from "typeorm"
 import * as bcrypt from "bcrypt"
 import { config } from "dotenv"
 import { User } from "./auth/user.entity"
+import { PatientRecord } from "./patients/patient.entity"
+import { ClinicalEntry } from "./patients/clinical-entry.entity"
+import { AccessLog } from "./audit/audit.entity"
+import { ProfessionalVerification } from "./professionals/professional.entity"
+import { PasswordResetToken } from "./auth/password-reset.entity"
+import { RefreshToken } from "./auth/refresh-token.entity"
+import { SyncOperation } from "./sync/sync.entity"
+import { SharingCode } from "./sharing/sharing.entity"
+import { AccessGrant } from "./sharing/access-grant.entity"
 import { UserRole } from "./common/decorators/roles.decorator"
 
 config()
 
 async function seed() {
   const databaseUrl = process.env.DATABASE_URL
+  const entities = [User, PatientRecord, ClinicalEntry, AccessLog, ProfessionalVerification, PasswordResetToken, RefreshToken, SyncOperation, SharingCode, AccessGrant]
   const dataSource = new DataSource(
     databaseUrl
       ? {
           type: "postgres",
           url: databaseUrl,
-          entities: [User],
+          entities,
           ssl: { rejectUnauthorized: false },
         }
       : {
@@ -24,7 +34,7 @@ async function seed() {
           port: Number(process.env.DB_PORT),
           username: process.env.DB_USERNAME,
           password: process.env.DB_PASSWORD,
-          entities: [User],
+          entities,
         }
   )
 
