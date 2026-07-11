@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom"
 import { auth as authApi } from "../services/api"
 
 export default function RegisterPage() {
-  const [form, setForm] = useState({ email: "", password: "", nom: "", prenom: "", role: "patient", telephone: "", professionalLicenseNumber: "" })
+  const [form, setForm] = useState({ email: "", password: "", nom: "", prenom: "", role: "patient", telephone: "", professionalLicenseNumber: "", establishment: "" })
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
@@ -14,6 +14,16 @@ export default function RegisterPage() {
     setError("")
     setSuccess("")
     try {
+      if (form.role !== "patient") {
+        if (!form.professionalLicenseNumber.trim()) {
+          setError("Le numéro d'enregistrement professionnel est requis.")
+          return
+        }
+        if (!form.establishment.trim()) {
+          setError("L'établissement est requis.")
+          return
+        }
+      }
       const response = await authApi.register(form)
       if (response.user.role !== "patient" && response.user.professionalStatus === "pending") {
         setSuccess("Votre compte a été créé. Un administrateur doit valider votre inscription avant de pouvoir vous connecter.")
@@ -93,10 +103,25 @@ export default function RegisterPage() {
             <input value={form.telephone} onChange={(e) => setForm({ ...form, telephone: e.target.value })} />
           </div>
           {form.role !== "patient" && (
-            <div className="form-group">
-              <label>Numéro d'enregistrement professionnel</label>
-              <input value={form.professionalLicenseNumber} onChange={(e) => setForm({ ...form, professionalLicenseNumber: e.target.value })} />
-            </div>
+            <>
+              <div className="form-group">
+                <label>Numéro d'enregistrement professionnel *</label>
+                <input
+                  value={form.professionalLicenseNumber}
+                  onChange={(e) => setForm({ ...form, professionalLicenseNumber: e.target.value })}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label>Établissement *</label>
+                <input
+                  value={form.establishment}
+                  onChange={(e) => setForm({ ...form, establishment: e.target.value })}
+                  required
+                  placeholder="Ex : CHU de Cotonou"
+                />
+              </div>
+            </>
           )}
           <button type="submit" className="btn btn-primary btn-block">S'inscrire</button>
         </form>

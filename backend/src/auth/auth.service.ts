@@ -86,7 +86,11 @@ export class AuthService {
     }
 
     if (user.role !== UserRole.PATIENT) {
-      await this.professionalService.createVerification(user.id, dto.professionalLicenseNumber || "")
+      await this.professionalService.createVerification(
+        user.id,
+        dto.professionalLicenseNumber || "",
+        dto.establishment,
+      )
     }
 
     const accessToken = this.generateToken(user)

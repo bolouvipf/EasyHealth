@@ -7,7 +7,7 @@ interface PendingProfessional {
   licenseNumber: string
   establishment?: string
   status: string
-  user?: { nom: string; prenom: string; email: string; role: string }
+  user?: { nom: string; prenom: string; email: string; role: string; telephone?: string }
 }
 
 interface AdminStats {
@@ -187,6 +187,7 @@ export default function AdminPage() {
                   <tr>
                     <th>Nom</th>
                     <th>Email</th>
+                    <th>Téléphone</th>
                     <th>Rôle</th>
                     <th>N° d'enregistrement</th>
                     <th>Établissement</th>
@@ -195,13 +196,14 @@ export default function AdminPage() {
                 </thead>
                 <tbody>
                   {pending.map((p) => (
-                    <tr key={p.id}>
-                      <td>{p.user ? `${p.user.prenom} ${p.user.nom}` : "—"}</td>
-                      <td>{p.user?.email || "—"}</td>
-                      <td>{p.user?.role || "—"}</td>
-                      <td>{p.licenseNumber}</td>
-                      <td>{p.establishment || "—"}</td>
-                      <td className="action-cells">
+                      <tr key={p.id}>
+                        <td>{p.user ? `${p.user.prenom} ${p.user.nom}` : "—"}</td>
+                        <td>{p.user?.email || "—"}</td>
+                        <td>{p.user?.telephone || "—"}</td>
+                        <td>{p.user?.role || "—"}</td>
+                        <td>{p.licenseNumber}</td>
+                        <td>{p.establishment || "—"}</td>
+                        <td className="action-cells">
                         <button className="btn btn-success btn-sm" onClick={() => handleVerify(p.id)}>Vérifier</button>
                         <button className="btn btn-danger btn-sm" onClick={() => handleReject(p.id)}>Rejeter</button>
                       </td>

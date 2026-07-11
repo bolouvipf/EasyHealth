@@ -1,4 +1,4 @@
-import { IsEmail, IsString, MinLength, IsEnum, IsOptional } from "class-validator"
+import { IsEmail, IsString, MinLength, IsEnum, IsOptional, IsNotEmpty, ValidateIf } from "class-validator"
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger"
 import { UserRole } from "../../common/decorators/roles.decorator"
 
@@ -30,7 +30,14 @@ export class RegisterDto {
   telephone?: string
 
   @ApiPropertyOptional({ example: "MED-2024-001234" })
-  @IsOptional()
+  @ValidateIf((o: RegisterDto) => o.role && o.role !== UserRole.PATIENT)
   @IsString()
+  @IsNotEmpty({ message: "Le numéro d'enregistrement professionnel est requis pour les professionnels" })
   professionalLicenseNumber?: string
+
+  @ApiPropertyOptional({ example: "CHU de Cotonou" })
+  @ValidateIf((o: RegisterDto) => o.role && o.role !== UserRole.PATIENT)
+  @IsString()
+  @IsNotEmpty({ message: "L'établissement est requis pour les professionnels" })
+  establishment?: string
 }
