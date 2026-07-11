@@ -1,18 +1,20 @@
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
-import { patients as patientsApi } from "../services/api"
+import { patients as patientsApi, dashboard as dashboardApi } from "../services/api"
 import { useAuth } from "../hooks/useAuth"
 import type { PatientRecord } from "../types"
 
 export default function PatientDashboard() {
   const [records, setRecords] = useState<PatientRecord[]>([])
-  const [showCreate, setShowCreate] = useState(false)
-  const [form, setForm] = useState({ nom: "", prenom: "", dateNaissance: "", sexe: "", telephone: "", adresse: "", profession: "", consentGiven: false })
+  const [stats, setStats] = useState<any>(null)
   const { user } = useAuth()
   const navigate = useNavigate()
+  const [showCreate, setShowCreate] = useState(false)
+  const [form, setForm] = useState({ nom: "", prenom: "", dateNaissance: "", sexe: "", telephone: "", adresse: "", profession: "", consentGiven: false })
 
   useEffect(() => {
-    patientsApi.findAll().then(setRecords).catch(console.error)
+    patientsApi.findMine().then(setRecords).catch(console.error)
+    dashboardApi.getDashboard().then(setStats).catch(console.error)
   }, [])
 
   const canCreate = user?.role === "medecin" || user?.role === "infirmier" || user?.role === "admin"

@@ -97,6 +97,7 @@ export const patients = {
   findAll: () => api.get("/patients").then((r) => r.data?.data ?? r.data),
   findAllPaginated: (page = 1, limit = 20) => api.get("/patients", { params: { page, limit } }).then((r) => r.data),
   findOne: (id: string) => api.get(`/patients/${id}`).then((r) => r.data),
+  findMine: () => api.get("/patients/mine").then((r) => r.data),
   create: (data: any) => api.post("/patients", data).then((r) => r.data),
   update: (id: string, data: any) => api.put(`/patients/${id}`, data).then((r) => r.data),
   remove: (id: string) => api.delete(`/patients/${id}`).then((r) => r.data),

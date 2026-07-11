@@ -36,11 +36,29 @@ export default function AdminPage() {
   const [pending, setPending] = useState<PendingProfessional[]>([])
   const [stats, setStats] = useState<AdminStats | null>(null)
   const [users, setUsers] = useState<AdminUser[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    adminApi.getStats().then(setStats).catch(console.error)
-    professionalsApi.findPending().then(setPending).catch(console.error)
-    adminApi.getUsers().then(setUsers).catch(console.error)
+    const load = async () => {
+      setLoading(true)
+      setError(null)
+      try {
+        const [s, p, u] = await Promise.all([
+          adminApi.getStats(),
+          professionalsApi.findPending(),
+          adminApi.getUsers(),
+        ])
+        setStats(s)
+        setPending(p)
+        setUsers(u)
+      } catch {
+        setError("Impossible de charger les données administratives.")
+      } finally {
+        setLoading(false)
+      }
+    }
+    load()
   }, [])
 
   const handleVerify = async (id: string) => {
@@ -86,6 +104,9 @@ export default function AdminPage() {
       <div className="page-header">
         <h1>Administration</h1>
       </div>
+
+      {error && <div className="alert alert-error">{error}</div>}
+      {loading && <p className="empty-state">Chargement…</p>}
 
       <div className="admin-tabs">
         <button className={`btn ${tab === "dashboard" ? "btn-primary" : "btn-secondary"}`} onClick={() => setTab("dashboard")}>Tableau de bord</button>

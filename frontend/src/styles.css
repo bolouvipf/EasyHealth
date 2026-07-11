@@ -1076,12 +1076,14 @@ h4 { font-size: clamp(1rem, 1.5vw + 0.5rem, 1.125rem); }
 .share-card h2 { font-size: 1.25rem; margin-bottom: 0.5rem; }
 .share-card p { font-size: 0.875rem; margin-bottom: 1.5rem; }
 
+.code-display { margin: 1.5rem 0; text-align: center; }
+.expires-at { font-size: 0.8125rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+.share-info { font-size: 0.8125rem; color: var(--text-muted); background: var(--keylime-wash); padding: 0.75rem 1rem; border-radius: var(--radius-card); margin-bottom: 1.5rem; text-align: left; }
+.share-note { font-size: 0.8125rem; color: var(--text-muted); margin-top: 1.5rem; border-top: 1px solid var(--border-mist); padding-top: 1rem; }
+
 /* TABLES */
 .audit-table-wrapper { overflow-x: auto; margin: 1rem -1.5rem; padding: 0 1.5rem 1rem; -webkit-overflow-scrolling: touch; }
 .audit-table { width: 100%; min-width: 600px; border-collapse: collapse; font-size: 0.875rem; }
-.audit-table th, .audit-table td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid var(--border-mist); white-space: nowrap; }
-.audit-table th { font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); background: var(--keylime-wash); }
-.audit-table tbody tr:hover { background: var(--keylime-wash); }
 .audit-table th, .audit-table td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid var(--border-mist); white-space: nowrap; }
 .audit-table th { font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); background: var(--keylime-wash); }
 .audit-table tbody tr:hover { background: var(--keylime-wash); }
@@ -1110,7 +1112,6 @@ h4 { font-size: clamp(1rem, 1.5vw + 0.5rem, 1.125rem); }
 
 /* ADMIN TABS */
 .admin-tabs { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
-.action-cells { display: flex; gap: 0.5rem; flex-wrap: wrap; }
 
 /* LANGUAGE SWITCHER */
 .lang-switcher { display: inline-flex; gap: 2px; margin-right: 0.5rem; }

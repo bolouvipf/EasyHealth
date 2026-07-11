@@ -48,6 +48,31 @@ export class AuthService {
     private readonly mailService: MailService,
   ) {}
 
+  async getStats() {
+    const totalUsers = await this.userRepository.count()
+    const usersByRole = await this.userRepository
+      .createQueryBuilder("user")
+      .select("user.role", "role")
+      .addSelect("COUNT(*)", "count")
+      .groupBy("user.role")
+      .getRawMany()
+
+    const activeUsers = await this.userRepository.count({ where: { isActive: true } })
+    const pendingProfessionals = await this.professionalService.findPending().then((v) => v.length)
+
+    const totalPatients = await this.dataSource
+      .getRepository("patient_records")
+      .count()
+
+    return {
+      totalUsers,
+      activeUsers,
+      pendingProfessionals,
+      totalPatients,
+      usersByRole,
+    }
+  }
+
   private validatePasswordComplexity(password: string) {
     const errors: string[] = []
     if (password.length < 8) errors.push("8 caractères minimum")
@@ -361,32 +386,5 @@ export class AuthService {
     await this.userRepository.save(user)
 
     return { message: "Mot de passe admin réinitialisé avec succès" }
-  }
-
-  async getStats() {
-    const totalUsers = await this.userRepository.count()
-    const usersByRole = await this.userRepository
-      .createQueryBuilder("user")
-      .select("user.role", "role")
-      .addSelect("COUNT(*)", "count")
-      .groupBy("user.role")
-      .getRawMany()
-
-    const activeUsers = await this.userRepository.count({ where: { isActive: true } })
-    const pendingProfessionals = await this.userRepository.count({
-      where: { role: UserRole.MEDECIN, professionalStatus: "pending" },
-    })
-
-    const totalPatients = await this.dataSource
-      .getRepository("patient_records")
-      .count()
-
-    return {
-      totalUsers,
-      activeUsers,
-      pendingProfessionals,
-      totalPatients,
-      usersByRole,
-    }
   }
 }

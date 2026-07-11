@@ -14,11 +14,6 @@ interface PatientData {
   lastVisit: string
 }
 
-const scrollTo = (id: string) => {
-  const el = document.getElementById(id)
-  if (el) el.scrollIntoView({ behavior: "smooth" })
-}
-
 function QrCode({ value, size = 180 }: { value: string; size?: number }) {
   const cells = 25
   const grid = useMemo(() => {
