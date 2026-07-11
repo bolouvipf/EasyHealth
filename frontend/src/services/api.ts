@@ -61,7 +61,11 @@ api.interceptors.response.use(
   (res) => res,
   async (err) => {
     const original = err.config
-    if (err.response?.status === 401 && !original._retry) {
+    if (
+      err.response?.status === 401 &&
+      !original._retry &&
+      original.headers?.Authorization
+    ) {
       original._retry = true
       const newToken = await refreshAccessToken()
       if (newToken) {
