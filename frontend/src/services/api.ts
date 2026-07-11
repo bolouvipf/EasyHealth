@@ -1,11 +1,13 @@
 import axios from "axios"
 
-let _refreshToken: string | null = null
+let _refreshToken: string | null = localStorage.getItem("easyhealth_refresh") || null
 let _refreshPromise: Promise<string | null> | null = null
 let _onLogout: (() => void) | null = null
 
 export function setStoredRefreshToken(t: string | null) {
   _refreshToken = t
+  if (t) localStorage.setItem("easyhealth_refresh", t)
+  else localStorage.removeItem("easyhealth_refresh")
 }
 
 export function getStoredRefreshToken() {
@@ -25,12 +27,14 @@ async function doRefresh(): Promise<string | null> {
   try {
     const res = await axios.post(API_BASE + "/auth/refresh", { refreshToken: rt })
     _refreshToken = res.data.refreshToken
+    localStorage.setItem("easyhealth_refresh", res.data.refreshToken)
     localStorage.setItem("easyhealth_token", res.data.accessToken)
     return res.data.accessToken
   } catch {
     _refreshToken = null
     localStorage.removeItem("easyhealth_token")
     localStorage.removeItem("easyhealth_user")
+    localStorage.removeItem("easyhealth_refresh")
     _onLogout?.()
     return null
   }

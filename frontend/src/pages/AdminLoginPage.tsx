@@ -1,25 +1,20 @@
 import { useState, FormEvent } from "react"
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "../hooks/useAuth"
-import { auth as authApi } from "../services/api"
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState("admin@easyhealth.bj")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState("")
-  const { setUser, setToken } = useAuth()
+  const { adminLogin } = useAuth()
   const navigate = useNavigate()
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     setError("")
     try {
-      const response = await authApi.adminLogin({ email, password })
-      localStorage.setItem("easyhealth_token", response.accessToken)
-      localStorage.setItem("easyhealth_user", JSON.stringify(response.user))
-      setToken(response.accessToken)
-      setUser(response.user)
+      await adminLogin(email, password)
       navigate("/admin")
     } catch (err: any) {
       setError(err.response?.data?.message || "Erreur de connexion")

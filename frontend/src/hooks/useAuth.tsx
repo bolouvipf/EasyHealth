@@ -7,6 +7,7 @@ interface AuthContextType {
   token: string | null
   isLoading: boolean
   login: (email: string, password: string) => Promise<void>
+  adminLogin: (email: string, password: string) => Promise<void>
   register: (data: any) => Promise<void>
   logout: () => Promise<void>
   logoutAll: () => Promise<void>
@@ -30,10 +31,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const savedToken = localStorage.getItem("easyhealth_token")
     const savedUser = localStorage.getItem("easyhealth_user")
+    const savedRefresh = localStorage.getItem("easyhealth_refresh")
     if (savedToken && savedUser) {
       setToken(savedToken)
       setUser(JSON.parse(savedUser))
     }
+    if (savedRefresh) setStoredRefreshToken(savedRefresh)
     setIsLoading(false)
   }, [])
 
@@ -55,6 +58,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const response = await authApi.login({ email, password })
     localStorage.setItem("easyhealth_token", response.accessToken)
     localStorage.setItem("easyhealth_user", JSON.stringify(response.user))
+    localStorage.setItem("easyhealth_refresh", response.refreshToken)
     setStoredRefreshToken(response.refreshToken)
     setToken(response.accessToken)
     setUser(response.user)
@@ -64,6 +68,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const response = await authApi.register(data)
     localStorage.setItem("easyhealth_token", response.accessToken)
     localStorage.setItem("easyhealth_user", JSON.stringify(response.user))
+    localStorage.setItem("easyhealth_refresh", response.refreshToken)
+    setStoredRefreshToken(response.refreshToken)
+    setToken(response.accessToken)
+    setUser(response.user)
+  }
+
+  const adminLogin = async (email: string, password: string) => {
+    const response = await authApi.adminLogin({ email, password })
+    localStorage.setItem("easyhealth_token", response.accessToken)
+    localStorage.setItem("easyhealth_user", JSON.stringify(response.user))
+    localStorage.setItem("easyhealth_refresh", response.refreshToken)
     setStoredRefreshToken(response.refreshToken)
     setToken(response.accessToken)
     setUser(response.user)
@@ -81,7 +96,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, isLoading, login, register, logout, logoutAll, setUser, setToken }}>
+    <AuthContext.Provider value={{ user, token, isLoading, login, adminLogin, register, logout, logoutAll, setUser, setToken }}>
       {children}
     </AuthContext.Provider>
   )
