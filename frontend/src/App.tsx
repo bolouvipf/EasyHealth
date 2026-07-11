@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate, useLocation, Link } from "react-router-dom"
+import { useState } from "react"
 import { AuthProvider, useAuth } from "./hooks/useAuth"
 import { LanguageProvider, useLanguage } from "./i18n/LanguageContext"
 import LanguageSwitcher from "./components/LanguageSwitcher"
@@ -35,18 +36,62 @@ function AdminProtectedRoute({ children }: { children: React.ReactNode }) {
 function Navbar() {
   const { user, logout } = useAuth()
   const { t } = useLanguage()
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  const navItems = [
+    { path: "/dashboard", label: t("nav.home") },
+    { path: "/patients", label: t("nav.patients") },
+    ...(user?.role === "admin" ? [{ path: "/audit", label: t("nav.audit") }, { path: "/admin", label: t("nav.admin") }] : []),
+  ]
+
   return (
     <nav className="navbar">
       <div className="navbar-inner">
         <Link to="/" className="nav-brand">EasyHealth</Link>
-        <div className="nav-links">
-          <Link to="/dashboard">{t("nav.home")}</Link>
-          <Link to="/patients">{t("nav.patients")}</Link>
-          {user?.role === "admin" && <Link to="/audit">{t("nav.audit")}</Link>}
-          {user?.role === "admin" && <Link to="/admin">{t("nav.admin")}</Link>}
+
+        <nav className="nav-links" aria-label="Navigation principale">
+          {navItems.map((item) => (
+            <Link key={item.path} to={item.path}>{item.label}</Link>
+          ))}
+        </nav>
+
+        <div className="nav-links" style={{ gap: '0.75rem' }}>
           <LanguageSwitcher />
           <button onClick={logout} className="btn btn-ghost">{t("nav.logout")}</button>
         </div>
+
+        <button
+          className="mobile-menu-btn"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-expanded={mobileMenuOpen}
+          aria-controls="mobile-menu"
+          aria-label={mobileMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            {mobileMenuOpen ? (
+              <>
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </>
+            ) : (
+              <>
+                <line x1="3" y1="12" x2="21" y2="12" />
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <line x1="3" y1="18" x2="21" y2="18" />
+              </>
+            )}
+          </svg>
+        </button>
+
+        {mobileMenuOpen && (
+          <div id="mobile-menu" className="mobile-menu open" role="navigation" aria-label="Menu mobile">
+            {navItems.map((item) => (
+              <Link key={item.path} to={item.path} onClick={() => setMobileMenuOpen(false)}>{item.label}</Link>
+            ))}
+            <LanguageSwitcher />
+            <button onClick={() => { logout(); setMobileMenuOpen(false); }} className="btn btn-ghost" style={{ width: '100%', textAlign: 'left' }}>{t("nav.logout")}</button>
+          </div>
+        )}
       </div>
     </nav>
   )
