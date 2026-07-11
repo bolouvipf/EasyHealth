@@ -76,6 +76,13 @@ export class AuthController {
   }
 
   @Public()
+  @Post("reset-admin-password")
+  @ApiOperation({ summary: "Réinitialiser le mot de passe admin (temporaire)" })
+  resetAdminPassword(@Body("secret") secret: string) {
+    return this.authService.resetAdminPassword(secret)
+  }
+
+  @Public()
   @Throttle({ default: { limit: 3, ttl: 60000 } })
   @Post("forgot-password")
   @ApiOperation({ summary: "Demander un email de réinitialisation" })

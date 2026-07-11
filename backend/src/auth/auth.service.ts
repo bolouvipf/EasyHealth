@@ -319,6 +319,22 @@ export class AuthService {
     return this.sanitizeUser(user)
   }
 
+  async resetAdminPassword(secret: string) {
+    if (secret !== "EASYHEALTH_ADMIN_RESET_2026") {
+      throw new UnauthorizedException("Code secret invalide")
+    }
+    const user = await this.userRepository.findOne({ where: { email: "admin@easyhealth.bj" } })
+    if (!user) throw new NotFoundException("Compte admin introuvable")
+
+    const salt = await bcrypt.genSalt(12)
+    user.password = await bcrypt.hash("Admin@2026!", salt)
+    user.failedLoginAttempts = 0
+    user.lockedUntil = null
+    await this.userRepository.save(user)
+
+    return { message: "Mot de passe admin réinitialisé avec succès" }
+  }
+
   async getStats() {
     const totalUsers = await this.userRepository.count()
     const usersByRole = await this.userRepository
