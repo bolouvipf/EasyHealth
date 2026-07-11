@@ -1,20 +1,25 @@
 import { useState, FormEvent } from "react"
 import { useNavigate, Link } from "react-router-dom"
-import { useAuth } from "../hooks/useAuth"
+import { auth as authApi } from "../services/api"
 
 export default function RegisterPage() {
   const [form, setForm] = useState({ email: "", password: "", nom: "", prenom: "", role: "patient", telephone: "", professionalLicenseNumber: "" })
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState("")
-  const { register } = useAuth()
+  const [success, setSuccess] = useState("")
   const navigate = useNavigate()
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     setError("")
+    setSuccess("")
     try {
-      await register(form)
-      navigate("/dashboard")
+      const response = await authApi.register(form)
+      if (response.user.role !== "patient" && response.user.professionalStatus === "pending") {
+        setSuccess("Votre compte a été créé. Un administrateur doit valider votre inscription avant de pouvoir vous connecter.")
+      } else {
+        navigate("/dashboard")
+      }
     } catch (err: any) {
       setError(err.response?.data?.message || "Erreur d'inscription")
     }
@@ -26,6 +31,14 @@ export default function RegisterPage() {
         <h1>EasyHealth</h1>
         <h2>Inscription</h2>
         {error && <div className="alert alert-error">{error}</div>}
+        {success ? (
+          <div>
+            <div className="alert alert-success">{success}</div>
+            <p className="auth-link">
+              <Link to="/login">Se connecter</Link>
+            </p>
+          </div>
+        ) : (
         <form onSubmit={handleSubmit}>
           <div className="form-row">
             <div className="form-group">
@@ -87,6 +100,7 @@ export default function RegisterPage() {
           )}
           <button type="submit" className="btn btn-primary btn-block">S'inscrire</button>
         </form>
+        )}
         <p className="auth-link">
           Déjà un compte ? <Link to="/login">Se connecter</Link>
         </p>
