@@ -13,6 +13,19 @@ export class ProfessionalService {
         private readonly userRepository: Repository<User>,
     ) {}
 
+    async createVerification(userId: string, licenseNumber: string, establishment?: string) {
+        const existing = await this.verificationRepository.findOne({ where: { userId } });
+        if (existing) return existing;
+
+        const verification = this.verificationRepository.create({
+            userId,
+            licenseNumber,
+            establishment,
+            status: "pending",
+        });
+        return this.verificationRepository.save(verification);
+    }
+
     async findPending() {
         const verifications = await this.verificationRepository.find({ where: { status: "pending" }, relations: ["user"] });
         return verifications;

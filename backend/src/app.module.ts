@@ -5,7 +5,7 @@ import { ThrottlerModule, ThrottlerGuard } from "@nestjs/throttler"
 import { APP_GUARD } from "@nestjs/core"
 import { AuthModule } from "./auth/auth.module"
 import { PatientsModule } from "./patients/patient.module"
-import { ProfessionalsModule } from "./professionals/professional.module"
+import { ProfessionalModule } from "./professionals/professional.module"
 import { SharingModule } from "./sharing/sharing.module"
 import { AuditModule } from "./audit/audit.module"
 import { SyncModule } from "./sync/sync.module"
@@ -49,7 +49,7 @@ import { MailModule } from "./mail/mail.module"
     EncryptionModule,
     AuthModule,
     PatientsModule,
-    ProfessionalsModule,
+    ProfessionalModule,
     SharingModule,
     AuditModule,
     SyncModule,

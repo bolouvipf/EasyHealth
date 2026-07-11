@@ -12,7 +12,7 @@ import { PasswordResetToken } from "./password-reset.entity"
 import { RefreshToken } from "./refresh-token.entity"
 import { PatientRecord } from "../patients/patient.entity"
 import { AuditModule } from "../audit/audit.module"
-import { ProfessionalsModule } from "../professionals/professional.module"
+import { ProfessionalModule } from "../professionals/professional.module"
 
 @Module({
   imports: [
@@ -33,7 +33,7 @@ import { ProfessionalsModule } from "../professionals/professional.module"
       },
     }),
     AuditModule,
-    ProfessionalsModule,
+    ProfessionalModule,
   ],
   controllers: [AuthController, AdminController],
   providers: [AuthService, JwtStrategy],

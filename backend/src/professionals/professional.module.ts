@@ -9,5 +9,6 @@ import { User } from "../auth/user.entity";
   imports: [TypeOrmModule.forFeature([ProfessionalVerification, User])],
   providers: [ProfessionalService],
   controllers: [ProfessionalController],
+  exports: [ProfessionalService],
 })
 export class ProfessionalModule {}
