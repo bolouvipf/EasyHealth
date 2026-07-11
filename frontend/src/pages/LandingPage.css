@@ -180,6 +180,31 @@
   opacity: 1;
   transform: none;
 }
+.hero-media {
+  width: min(440px, 100%);
+  border-radius: 26px;
+  overflow: hidden;
+  background: linear-gradient(160deg, var(--primary-soft), #eaf1fb);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border);
+  aspect-ratio: 4 / 3;
+  display: grid;
+  place-items: center;
+}
+.hero-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.demo-visual {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 36px;
+}
+.demo-visual .phone {
+  width: 260px;
+}
 
 /* Phone mockup */
 .phone {

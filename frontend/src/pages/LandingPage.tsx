@@ -97,8 +97,15 @@ function HeroSection({ scrollTo }: { scrollTo: (id: string) => void }) {
           </ul>
         </div>
 
-        <div className={`hero-visual ${animate ? "is-visible" : ""}`} aria-hidden="true">
-          <DoctorScanAnimation />
+        <div className={`hero-visual ${animate ? "is-visible" : ""}`}>
+          <div className="hero-media">
+            <img
+              src="/doctor-hero.png"
+              alt="Médecin scannant le QR code d'un patient avec EasyHealth"
+              className="hero-img"
+              onError={(e) => (e.currentTarget.style.display = "none")}
+            />
+          </div>
         </div>
       </div>
     </section>
@@ -250,6 +257,9 @@ function DemoSection() {
   return (
     <section id="demo" className="section demo">
       <div className="container">
+        <div className="demo-visual">
+          <DoctorScanAnimation />
+        </div>
         <header className="section-head">
           <span className="eyebrow">Démonstration</span>
           <h2>Voyez EasyHealth en action</h2>
