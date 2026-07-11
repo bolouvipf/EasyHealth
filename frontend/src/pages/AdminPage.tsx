@@ -102,61 +102,85 @@ export default function AdminPage() {
   return (
     <div>
       <div className="page-header">
-        <h1>Administration</h1>
+        <div>
+          <h1>Administration</h1>
+          <p className="page-subtitle">
+            Gérez les utilisateurs, supervisez les vérifications professionnelles et consultez les statistiques de la plateforme.
+          </p>
+        </div>
       </div>
 
       {error && <div className="alert alert-error">{error}</div>}
       {loading && <p className="empty-state">Chargement…</p>}
 
       <div className="admin-tabs">
-        <button className={`btn ${tab === "dashboard" ? "btn-primary" : "btn-secondary"}`} onClick={() => setTab("dashboard")}>Tableau de bord</button>
-        <button className={`btn ${tab === "users" ? "btn-primary" : "btn-secondary"}`} onClick={() => setTab("users")}>Utilisateurs</button>
-        <button className={`btn ${tab === "verifications" ? "btn-primary" : "btn-secondary"}`} onClick={() => setTab("verifications")}>
-          Vérifications {pending.length > 0 && <span className="badge">{pending.length}</span>}
+        <button className={`tab ${tab === "dashboard" ? "is-active" : ""}`} onClick={() => setTab("dashboard")}>Tableau de bord</button>
+        <button className={`tab ${tab === "users" ? "is-active" : ""}`} onClick={() => setTab("users")}>Utilisateurs</button>
+        <button className={`tab ${tab === "verifications" ? "is-active" : ""}`} onClick={() => setTab("verifications")}>
+          Vérifications
+          {pending.length > 0 && <span className="tab-badge">{pending.length}</span>}
         </button>
       </div>
 
       {tab === "dashboard" && stats && (
-        <div className="stats-grid">
-          <div className="card stat-card">
-            <div className="stat-value">{stats.totalUsers}</div>
-            <div className="stat-label">Utilisateurs</div>
+        <>
+          <div className="stats-grid">
+            <div className="card stat-card">
+              <div className="stat-value">{stats.totalUsers}</div>
+              <div className="stat-label">Utilisateurs</div>
+            </div>
+            <div className="card stat-card">
+              <div className="stat-value">{stats.activeUsers}</div>
+              <div className="stat-label">Actifs</div>
+            </div>
+            <div className="card stat-card">
+              <div className="stat-value">{stats.totalPatients}</div>
+              <div className="stat-label">Dossiers patients</div>
+            </div>
+            <div className="card stat-card is-warning">
+              <div className="stat-value">{stats.pendingProfessionals}</div>
+              <div className="stat-label">En attente</div>
+            </div>
           </div>
-          <div className="card stat-card">
-            <div className="stat-value">{stats.activeUsers}</div>
-            <div className="stat-label">Actifs</div>
-          </div>
-          <div className="card stat-card">
-            <div className="stat-value">{stats.totalPatients}</div>
-            <div className="stat-label">Dossiers patients</div>
-          </div>
-          <div className="card stat-card">
-            <div className="stat-value">{stats.pendingProfessionals}</div>
-            <div className="stat-label">En attente</div>
-          </div>
-        </div>
-      )}
 
-      {tab === "dashboard" && stats && (
-        <div className="card">
-          <h2>Répartition par rôle</h2>
-          <div className="role-breakdown">
-            {stats.usersByRole.map((r) => (
-              <div key={r.role} className="role-row">
-                <span className="role-name">{roleLabels[r.role] || r.role}</span>
-                <div className="role-bar-wrapper">
-                  <div className="role-bar" style={{ width: `${(r.count / stats.totalUsers) * 100}%` }} />
-                </div>
-                <span className="role-count">{r.count}</span>
+          <div className="admin-dash-grid">
+            <div className="card">
+              <div className="card-head">
+                <h2>Répartition par rôle</h2>
               </div>
-            ))}
+              <div className="role-breakdown">
+                {stats.usersByRole.map((r) => (
+                  <div key={r.role} className="role-row">
+                    <span className="role-name">{roleLabels[r.role] || r.role}</span>
+                    <div className="role-bar-wrapper">
+                      <div className="role-bar" style={{ width: `${(r.count / stats.totalUsers) * 100}%` }} />
+                    </div>
+                    <span className="role-count">{r.count}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="card task-card">
+              <div className="card-head">
+                <h2>À traiter</h2>
+              </div>
+              <div className="task-value">{pending.length}</div>
+              <p>professionnel(s) en attente de vérification.</p>
+              <button className="btn btn-primary btn-sm" onClick={() => setTab("verifications")}>
+                Traiter les demandes
+              </button>
+            </div>
           </div>
-        </div>
+        </>
       )}
 
       {tab === "users" && (
         <div className="card">
-          <h2>Gestion des utilisateurs</h2>
+          <div className="card-head">
+            <h2>Gestion des utilisateurs</h2>
+            <span className="muted-count">{users.length} au total</span>
+          </div>
           <div className="audit-table-wrapper">
             <table className="audit-table">
               <thead>
@@ -198,7 +222,10 @@ export default function AdminPage() {
 
       {tab === "verifications" && (
         <div className="card">
-          <h2>Vérifications professionnelles en attente</h2>
+          <div className="card-head">
+            <h2>Vérifications professionnelles</h2>
+            <span className="muted-count">{pending.length} en attente</span>
+          </div>
           {pending.length === 0 ? (
             <p className="empty-state">Aucune demande en attente</p>
           ) : (
