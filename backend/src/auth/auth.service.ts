@@ -319,6 +319,15 @@ export class AuthService {
     return this.sanitizeUser(user)
   }
 
+  async deleteUser(id: string) {
+    const user = await this.userRepository.findOne({ where: { id } })
+    if (!user) throw new NotFoundException("Utilisateur introuvable")
+    await this.resetTokenRepository.delete({ user: { id } })
+    await this.refreshTokenRepository.delete({ user: { id } })
+    await this.userRepository.delete(id)
+    return { message: "Utilisateur supprimé avec succès" }
+  }
+
   async resetAdminPassword(secret: string) {
     if (secret !== "EASYHEALTH_ADMIN_RESET_2026") {
       throw new UnauthorizedException("Code secret invalide")
