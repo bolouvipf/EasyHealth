@@ -1,45 +1,45 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToOne, JoinColumn } from "typeorm"
-import { User } from "../auth/user.entity"
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToOne, JoinColumn } from "typeorm";
+import { User } from "../auth/user.entity";
 
 @Entity("professional_verifications")
 export class ProfessionalVerification {
-  @PrimaryGeneratedColumn("uuid")
-  id: string
+    @PrimaryGeneratedColumn("uuid")
+    id: string;
 
-  @OneToOne(() => User)
-  @JoinColumn({ name: "user_id" })
-  user: User
+    @OneToOne(() => User)
+    @JoinColumn({ name: "user_id" })
+    user: User;
 
-  @Column()
-  userId: string
+    @Column()
+    userId: string;
 
-  @Column()
-  licenseNumber: string
+    @Column()
+    licenseNumber: string;
 
-  @Column({ nullable: true })
-  issuingAuthority: string
+    @Column({ nullable: true })
+    issuingAuthority: string;
 
-  @Column({ nullable: true })
-  speciality: string
+    @Column({ nullable: true })
+    speciality: string;
 
-  @Column({ nullable: true })
-  establishment: string
+    @Column({ nullable: true })
+    establishment: string;
 
-  @Column({ default: "pending" })
-  status: string
+    @Column({ default: "pending" })
+    status: string;
 
-  @Column({ nullable: true })
-  verifiedAt: Date
+    @Column({ nullable: true })
+    verifiedAt: Date;
 
-  @Column({ nullable: true })
-  verifiedById: string
+    @Column({ nullable: true })
+    verifiedById: string;
 
-  @Column({ nullable: true })
-  rejectionReason: string
+    @Column({ nullable: true })
+    rejectionReason: string;
 
-  @CreateDateColumn()
-  createdAt: Date
+    @CreateDateColumn()
+    createdAt: Date;
 
-  @UpdateDateColumn()
-  updatedAt: Date
+    @UpdateDateColumn()
+    updatedAt: Date;
 }

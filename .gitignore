@@ -1,8 +1,22 @@
-node_modules/
+# EasyHealth Backend Artifacts
+*.log
+*.pid
+*.sqlite
 dist/
-*.db
-data/
-.env
-coverage/
+data/*.db
 
-.vercel
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# Node
+node_modules/
+*.env
+*.env.local
+*.env.production
+
+# OS
+.DS_Store
+Thumbs.db
