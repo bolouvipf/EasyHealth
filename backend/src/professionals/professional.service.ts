@@ -13,6 +13,11 @@ export class ProfessionalService {
         private readonly userRepository: Repository<User>,
     ) {}
 
+    async findPending() {
+        const verifications = await this.verificationRepository.find({ where: { status: "pending" }, relations: ["user"] });
+        return verifications;
+    }
+
     async findById(id: string) {
         const professional = await this.verificationRepository.findOne({ where: { id }, relations: ["user"] });
         if (!professional) throw new NotFoundException("Professionnel introuvable");
