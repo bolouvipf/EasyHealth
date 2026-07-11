@@ -138,6 +138,48 @@ export class AuthService {
     return { user: this.sanitizeUser(user), accessToken, refreshToken }
   }
 
+  async adminLogin(dto: LoginDto, ip?: string) {
+    const user = await this.userRepository.findOne({ where: { email: dto.email } })
+    if (!user) throw new UnauthorizedException("Email ou mot de passe incorrect")
+
+    if (user.role !== UserRole.ADMIN) {
+      throw new ForbiddenException("Accès réservé aux administrateurs")
+    }
+
+    if (!user.isActive) throw new ForbiddenException("Compte administrateur désactivé")
+
+    if (user.lockedUntil && user.lockedUntil > new Date()) {
+      const remaining = Math.ceil((user.lockedUntil.getTime() - Date.now()) / 60000)
+      throw new ForbiddenException(`Compte verrouillé. Réessayez dans ${remaining} minute(s).`)
+    }
+
+    const isPasswordValid = await bcrypt.compare(dto.password, user.password)
+    if (!isPasswordValid) {
+      user.failedLoginAttempts += 1
+      if (user.failedLoginAttempts >= MAX_FAILED_ATTEMPTS) {
+        user.lockedUntil = new Date(Date.now() + LOCKOUT_MINUTES * 60 * 1000)
+      }
+      await this.userRepository.save(user)
+      throw new UnauthorizedException("Email ou mot de passe incorrect")
+    }
+
+    user.failedLoginAttempts = 0
+    user.lockedUntil = null
+    user.lastLoginAt = new Date()
+    await this.userRepository.save(user)
+
+    await this.auditService.log({
+      action: AuditAction.CONNEXION,
+      userId: user.id,
+      details: "Connexion admin réussie",
+      ipAddress: ip,
+    })
+
+    const accessToken = this.generateToken(user)
+    const refreshToken = await this.generateRefreshToken(user)
+    return { user: this.sanitizeUser(user), accessToken, refreshToken }
+  }
+
   async verifyProfessional(userId: string) {
     const user = await this.userRepository.findOne({ where: { id: userId } })
     if (!user) throw new ForbiddenException("Utilisateur introuvable")

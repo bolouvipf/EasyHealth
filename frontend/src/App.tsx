@@ -4,6 +4,7 @@ import { LanguageProvider, useLanguage } from "./i18n/LanguageContext"
 import LanguageSwitcher from "./components/LanguageSwitcher"
 import LandingPage from "./pages/LandingPage"
 import LoginPage from "./pages/LoginPage"
+import AdminLoginPage from "./pages/AdminLoginPage"
 import RegisterPage from "./pages/RegisterPage"
 import ForgotPasswordPage from "./pages/ForgotPasswordPage"
 import ResetPasswordPage from "./pages/ResetPasswordPage"
@@ -20,6 +21,14 @@ function ProtectedRoute({ children, roles }: { children: React.ReactNode; roles?
   if (isLoading) return <div className="loading">Chargement...</div>
   if (!user) return <Navigate to="/login" />
   if (roles && !roles.includes(user.role)) return <Navigate to="/" />
+  return <>{children}</>
+}
+
+function AdminProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { user, isLoading } = useAuth()
+  if (isLoading) return <div className="loading">Chargement...</div>
+  if (!user) return <Navigate to="/adminlogin" />
+  if (user.role !== "admin") return <Navigate to="/" />
   return <>{children}</>
 }
 
@@ -45,7 +54,7 @@ function Navbar() {
 
 function App() {
   const location = useLocation()
-  const publicPaths = ["/", "/login", "/register", "/forgot-password", "/reset-password"]
+  const publicPaths = ["/", "/login", "/adminlogin", "/register", "/forgot-password", "/reset-password"]
   const showNavbar = !publicPaths.includes(location.pathname)
 
   return (
@@ -56,6 +65,7 @@ function App() {
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/adminlogin" element={<AdminLoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
@@ -64,7 +74,7 @@ function App() {
             <Route path="/patients/:id" element={<ProtectedRoute roles={["medecin", "infirmier", "admin"]}><PatientDetail /></ProtectedRoute>} />
             <Route path="/share/:id" element={<ProtectedRoute roles={["patient"]}><SharePage /></ProtectedRoute>} />
             <Route path="/audit" element={<ProtectedRoute roles={["admin"]}><AuditLogPage /></ProtectedRoute>} />
-            <Route path="/admin" element={<ProtectedRoute roles={["admin"]}><AdminPage /></ProtectedRoute>} />
+            <Route path="/admin" element={<AdminProtectedRoute><AdminPage /></AdminProtectedRoute>} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </div>

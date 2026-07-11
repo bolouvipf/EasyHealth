@@ -35,6 +35,15 @@ export class AuthController {
 
   @Public()
   @Throttle({ default: { limit: 5, ttl: 60000 } })
+  @Post("admin-login")
+  @ApiOperation({ summary: "Connexion administrateur (réservée)" })
+  adminLogin(@Body() dto: LoginDto, @Req() req: any) {
+    const ip = req.headers["x-forwarded-for"] || req.ip
+    return this.authService.adminLogin(dto, ip)
+  }
+
+  @Public()
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post("refresh")
   @ApiOperation({ summary: "Rafraîchir le token d'accès" })
   refresh(@Body("refreshToken") refreshToken: string) {

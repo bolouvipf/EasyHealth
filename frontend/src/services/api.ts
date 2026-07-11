@@ -80,6 +80,7 @@ api.interceptors.response.use(
 export const auth = {
   register: (data: any) => api.post("/auth/register", data).then((r) => r.data),
   login: (data: any) => api.post("/auth/login", data).then((r) => r.data),
+  adminLogin: (data: any) => api.post("/auth/admin-login", data).then((r) => r.data),
   me: () => api.get("/auth/me").then((r) => r.data),
   forgotPassword: (data: any) => api.post("/auth/forgot-password", data).then((r) => r.data),
   resetPassword: (data: any) => api.post("/auth/reset-password", data).then((r) => r.data),
