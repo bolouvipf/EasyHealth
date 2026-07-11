@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { useNavigate, Link } from "react-router-dom"
 import { useAuth } from "../hooks/useAuth"
-import { dashboard as dashboardApi, patients as patientsApi } from "../services/api"
+import { dashboard as dashboardApi, patients as patientsApi, sharing as sharingApi } from "../services/api"
 import type { PatientRecord, ClinicalEntry } from "../types"
 
 function CodeEntryCard({ onAccess }: { onAccess: (recordId: string) => void }) {
@@ -15,7 +15,6 @@ function CodeEntryCard({ onAccess }: { onAccess: (recordId: string) => void }) {
     setLoading(true)
     setError("")
     try {
-      const { sharing: sharingApi } = await import("../services/api")
       const record = await sharingApi.accessByCode(code)
       onAccess(record.id)
     } catch (err: any) {
@@ -209,7 +208,7 @@ function AgentDashboard() {
           <div className="stat-label">Patients suivis</div>
         </div>
         <div className="card stat-card card-sage">
-          <div className="stat-value">{records.length}</div>
+          <div className="stat-value">{stats?.totalPatients ?? records.length}</div>
           <div className="stat-label">Total dans le système</div>
         </div>
       </div>

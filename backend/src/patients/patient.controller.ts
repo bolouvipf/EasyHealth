@@ -36,6 +36,12 @@ export class PatientController {
     return this.patientService.create(dto, user.sub, user.role, ip)
   }
 
+  @Get("mine")
+  @ApiOperation({ summary: "Lister les dossiers du patient connecté" })
+  findMine(@CurrentUser() user: any) {
+    return this.patientService.findMine(user.sub)
+  }
+
   @Get()
   @ApiOperation({ summary: "Lister les dossiers patients" })
   findAll(@CurrentUser() user: any, @Query() pagination: PaginationDto) {

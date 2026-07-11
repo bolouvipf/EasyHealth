@@ -62,6 +62,14 @@ export class PatientService {
     return saved
   }
 
+  async findMine(userId: string): Promise<PatientRecord[]> {
+    return this.patientRepository.find({
+      where: { userId, isActive: true },
+      relations: ["clinicalEntries"],
+      order: { createdAt: "DESC" },
+    })
+  }
+
   async findAll(userId: string, userRole: string, pagination?: PaginationDto): Promise<PaginatedResult<PatientRecord>> {
     const page = pagination?.page ?? 1
     const limit = pagination?.limit ?? 20
@@ -94,6 +102,12 @@ export class PatientService {
       where: { granteeId: userId, patientRecordId: record.id, revokedAt: IsNull() },
     })
     if (!grant || grant.expiresAt < new Date()) throw new ForbiddenException("Vous n'avez pas accès à ce dossier")
+  }
+
+  async checkMineAccess(userId: string) {
+    return this.patientRepository.findOne({
+      where: { userId, isActive: true },
+    })
   }
 
   async findOne(id: string, userId: string, userRole: string, ip?: string) {

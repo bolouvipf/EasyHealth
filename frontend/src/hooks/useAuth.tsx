@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react"
-import { auth as authApi, setStoredRefreshToken, setLogoutHandler } from "../services/api"
+import { auth as authApi, setStoredRefreshToken, setLogoutHandler, getStoredRefreshToken } from "../services/api"
 import type { User } from "../types"
 
 interface AuthContextType {
@@ -85,7 +85,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const logout = async () => {
-    try { await authApi.logout("") } catch {}
+    const refreshToken = getStoredRefreshToken()
+    try { if (refreshToken) await authApi.logout(refreshToken) } catch {}
     setStoredRefreshToken(null)
     doLogout()
   }
