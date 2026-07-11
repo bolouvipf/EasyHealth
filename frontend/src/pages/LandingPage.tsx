@@ -464,7 +464,7 @@ function Footer() {
         <nav className="footer-col">
           <h4>Ressources</h4>
           <a href="#">Documentation API</a>
-          <a href="#">Guide patient</a>
+          <Link to="/guide-patient">Guide patient</Link>
           <Link to="/faq">FAQ</Link>
         </nav>
         <nav className="footer-col">
