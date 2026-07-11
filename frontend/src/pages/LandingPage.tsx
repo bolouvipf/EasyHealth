@@ -99,6 +99,10 @@ function HeroSection({ scrollTo }: { scrollTo: (id: string) => void }) {
 
         <div className={`hero-visual ${animate ? "is-visible" : ""}`}>
           <div className="hero-media">
+            <div className="hero-fallback">
+              <QrCode value="EASYHEALTH" size={130} />
+              <span>Dossier de santé sécurisé</span>
+            </div>
             <img
               src="/doctor-hero.png"
               alt="Médecin scannant le QR code d'un patient avec EasyHealth"

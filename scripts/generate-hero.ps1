@@ -22,7 +22,7 @@ $url = "https://api-inference.huggingface.co/models/$model"
 
 $prompt = "Flat vector illustration, healthcare theme, a friendly Black African doctor in a white coat holding a smartphone, scanning a QR code on a patient phone, soft green and teal palette, rounded minimal shapes, clean light background, reassuring calm atmosphere, modern medical app, no text, no letters"
 
-$outDir = Join-Path $PSScriptRoot ".." "frontend" "public"
+$outDir = Join-Path $PSScriptRoot "..\frontend\public"
 if (-not (Test-Path $outDir)) { New-Item -ItemType Directory -Path $outDir | Out-Null }
 $outFile = Join-Path $outDir "doctor-hero.png"
 

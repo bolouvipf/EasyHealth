@@ -181,6 +181,7 @@
   transform: none;
 }
 .hero-media {
+  position: relative;
   width: min(440px, 100%);
   border-radius: 26px;
   overflow: hidden;
@@ -188,10 +189,21 @@
   box-shadow: var(--shadow-lg);
   border: 1px solid var(--border);
   aspect-ratio: 4 / 3;
-  display: grid;
-  place-items: center;
+}
+.hero-fallback {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  color: var(--primary-dark);
+  font-weight: 600;
 }
 .hero-img {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
