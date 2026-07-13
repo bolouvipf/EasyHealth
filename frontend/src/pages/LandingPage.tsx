@@ -56,6 +56,57 @@ function QrCode({ value, size = 180 }: { value: string; size?: number }) {
   )
 }
 
+function FloatingNav({ scrollTo }: { scrollTo: (id: string) => void }) {
+  const [scrolled, setScrolled] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 40)
+    window.addEventListener("scroll", onScroll, { passive: true })
+    return () => window.removeEventListener("scroll", onScroll)
+  }, [])
+
+  return (
+    <nav className={`landing-nav ${scrolled ? "scrolled" : ""}`}>
+      <div className="container landing-nav-inner">
+        <Link to="/" className="landing-nav-brand">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          </svg>
+          EasyHealth
+        </Link>
+
+        <div className={`landing-nav-links ${mobileOpen ? "open" : ""}`}>
+          <button className="nav-link-btn" onClick={() => { scrollTo("features"); setMobileOpen(false) }}>Fonctionnalités</button>
+          <button className="nav-link-btn" onClick={() => { scrollTo("demo"); setMobileOpen(false) }}>Démo</button>
+          <Link to="/faq" onClick={() => setMobileOpen(false)}>FAQ</Link>
+          <Link to="/guide-patient" onClick={() => setMobileOpen(false)}>Guide patient</Link>
+          <Link to="/guide-pro" onClick={() => setMobileOpen(false)}>Guide pro</Link>
+          <Link to="/forgot-password" className="nav-link-muted" onClick={() => setMobileOpen(false)}>Mot de passe oublié</Link>
+          <div className="landing-nav-cta">
+            <Link to="/login" className="btn btn-ghost btn-sm" onClick={() => setMobileOpen(false)}>Connexion</Link>
+            <Link to="/register" className="btn btn-primary btn-sm" onClick={() => setMobileOpen(false)}>S'inscrire</Link>
+          </div>
+        </div>
+
+        <button
+          className="landing-nav-toggle"
+          onClick={() => setMobileOpen(!mobileOpen)}
+          aria-label={mobileOpen ? "Fermer le menu" : "Ouvrir le menu"}
+        >
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            {mobileOpen ? (
+              <><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></>
+            ) : (
+              <><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" /></>
+            )}
+          </svg>
+        </button>
+      </div>
+    </nav>
+  )
+}
+
 function HeroSection({ scrollTo }: { scrollTo: (id: string) => void }) {
   const [animate, setAnimate] = useState(false)
   useEffect(() => {
@@ -254,7 +305,7 @@ function DemoSection() {
   }
 
   return (
-    <section id="demo" className="section demo">
+    <section id="demo" className="section demo" data-anchor="demo">
       <div className="container">
         <div className="demo-visual">
           <DoctorScanAnimation />
@@ -397,7 +448,7 @@ function FeaturesSection() {
   ]
 
   return (
-    <section className="section features">
+    <section id="features" className="section features">
       <div className="container">
         <header className="section-head">
           <span className="eyebrow">Fonctionnalités</span>
@@ -498,6 +549,7 @@ export default function LandingPage() {
   return (
     <div className="landing">
       <a href="#main" className="skip">Aller au contenu</a>
+      <FloatingNav scrollTo={scrollTo} />
       <HeroSection scrollTo={scrollTo} />
       <main id="main">
         <DemoSection />
