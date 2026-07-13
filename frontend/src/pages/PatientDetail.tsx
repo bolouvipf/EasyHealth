@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { useParams } from "react-router-dom"
 import { patients as patientsApi } from "../services/api"
-import type { PatientRecord, ClinicalEntry } from "../types"
+import type { PatientRecord, ClinicalEntry, Specialty } from "../types"
 
 const entryTypeLabels: Record<string, string> = {
   CONSULTATION: "Consultation",
@@ -13,14 +13,28 @@ const entryTypeLabels: Record<string, string> = {
   TRAITEMENT: "Traitement",
 }
 
+const specialtyLabels: Record<string, string> = {
+  generale: "Générale",
+  neurologie: "Neurologie",
+  cardiologie: "Cardiologie",
+}
+
+const specialtyColors: Record<string, string> = {
+  generale: "var(--primary)",
+  neurologie: "#7c3aed",
+  cardiologie: "#dc2626",
+}
+
 export default function PatientDetail() {
   const { id } = useParams<{ id: string }>()
   const [record, setRecord] = useState<PatientRecord | null>(null)
   const [entries, setEntries] = useState<ClinicalEntry[]>([])
   const [editing, setEditing] = useState(false)
   const [form, setForm] = useState<any>({})
-  const [entryForm, setEntryForm] = useState({ entryType: "NOTE", content: "" })
+  const [entryForm, setEntryForm] = useState({ entryType: "NOTE", content: "", specialty: "generale" })
   const [showEntryForm, setShowEntryForm] = useState(false)
+  const [activeSpecialty, setActiveSpecialty] = useState<string | null>(null)
+  const [expandedSpecialties, setExpandedSpecialties] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     if (!id) return
@@ -51,12 +65,30 @@ export default function PatientDetail() {
     try {
       const entry = await patientsApi.addClinicalEntry(id, entryForm)
       setEntries([...entries, entry])
-      setEntryForm({ entryType: "NOTE", content: "" })
+      setEntryForm({ entryType: "NOTE", content: "", specialty: "generale" })
       setShowEntryForm(false)
     } catch (err) {
       console.error(err)
     }
   }
+
+  const toggleSpecialty = (s: string) => {
+    setExpandedSpecialties((prev) => {
+      const next = new Set(prev)
+      if (next.has(s)) next.delete(s)
+      else next.add(s)
+      return next
+    })
+  }
+
+  const groupedBySpecialty = entries.reduce<Record<string, ClinicalEntry[]>>((acc, entry) => {
+    const s = entry.specialty || "generale"
+    if (!acc[s]) acc[s] = []
+    acc[s].push(entry)
+    return acc
+  }, {})
+
+  const specialtyOrder = ["generale", "neurologie", "cardiologie"]
 
   const fields = [
     { key: "nom", label: "Nom" },
@@ -64,6 +96,7 @@ export default function PatientDetail() {
     { key: "dateNaissance", label: "Date de naissance", type: "date" },
     { key: "sexe", label: "Sexe" },
     { key: "groupeSanguin", label: "Groupe sanguin" },
+    { key: "npi", label: "NPI (ANIP Bénin)" },
     { key: "telephone", label: "Téléphone" },
     { key: "adresse", label: "Adresse" },
     { key: "profession", label: "Profession" },
@@ -130,6 +163,14 @@ export default function PatientDetail() {
               </select>
             </div>
             <div className="form-group">
+              <label>Spécialité</label>
+              <select value={entryForm.specialty} onChange={(e) => setEntryForm({ ...entryForm, specialty: e.target.value })}>
+                {Object.entries(specialtyLabels).map(([key, label]) => (
+                  <option key={key} value={key}>{label}</option>
+                ))}
+              </select>
+            </div>
+            <div className="form-group">
               <label>Contenu</label>
               <textarea value={entryForm.content} onChange={(e) => setEntryForm({ ...entryForm, content: e.target.value })} required placeholder="Notes, observations, prescription..." />
             </div>
@@ -142,20 +183,69 @@ export default function PatientDetail() {
             Aucune entrée clinique pour ce dossier.
           </p>
         ) : (
-          entries.map((entry) => (
-            <div key={entry.id} className="card clinical-entry">
-              <div className="clinical-entry-header">
-                <span className={`entry-type-badge ${entry.entryType}`}>{entryTypeLabels[entry.entryType] || entry.entryType}</span>
-                <span className="entry-date">{new Date(entry.createdAt).toLocaleString("fr-FR")}</span>
-              </div>
-              <div className="entry-content">{entry.content}</div>
-              {entry.metadata?.authorName && (
-                <div className="entry-author" style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: "0.25rem", borderTop: "1px solid var(--border-mist)", paddingTop: "0.25rem" }}>
-                  Par {entry.metadata.authorName}{entry.metadata?.hospital && ` — ${entry.metadata.hospital}`}
+          <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+            {specialtyOrder.map((s) => {
+              const groupEntries = groupedBySpecialty[s]
+              if (!groupEntries?.length) return null
+              const isExpanded = expandedSpecialties.has(s)
+              const isDefaultOpen = s === "generale"
+
+              return (
+                <div key={s} className="card" style={{ padding: 0, overflow: "hidden" }}>
+                  <button
+                    onClick={() => toggleSpecialty(s)}
+                    style={{
+                      width: "100%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      padding: "0.75rem 1rem",
+                      border: "none",
+                      background: isDefaultOpen ? "var(--primary)" : "var(--bg-secondary, #f5f5f5)",
+                      color: isDefaultOpen ? "#fff" : "var(--text)",
+                      cursor: "pointer",
+                      fontWeight: 500,
+                      fontSize: "0.9rem",
+                      fontFamily: "var(--font-sans)",
+                    }}
+                  >
+                    <span style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                      <span style={{
+                        width: 8, height: 8, borderRadius: "50%",
+                        background: specialtyColors[s] || "var(--primary)",
+                        display: "inline-block",
+                      }} />
+                      {specialtyLabels[s] || s}
+                      <span style={{ opacity: 0.7, fontWeight: 400, fontSize: "0.8rem" }}>
+                        ({groupEntries.length})
+                      </span>
+                    </span>
+                    <span style={{ transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>
+                      ▼
+                    </span>
+                  </button>
+                  {(isExpanded || isDefaultOpen) && (
+                    <div style={{ padding: "1rem", display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+                      {groupEntries.map((entry) => (
+                        <div key={entry.id} className="clinical-entry" style={{ borderBottom: "1px solid var(--border-mist)", paddingBottom: "0.75rem" }}>
+                          <div className="clinical-entry-header">
+                            <span className={`entry-type-badge ${entry.entryType}`}>{entryTypeLabels[entry.entryType] || entry.entryType}</span>
+                            <span className="entry-date">{new Date(entry.createdAt).toLocaleString("fr-FR")}</span>
+                          </div>
+                          <div className="entry-content">{entry.content}</div>
+                          {entry.metadata?.authorName && (
+                            <div className="entry-author" style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: "0.25rem" }}>
+                              Par {entry.metadata.authorName}{entry.metadata?.hospital && ` — ${entry.metadata.hospital}`}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-          ))
+              )
+            })}
+          </div>
         )}
       </div>
     </div>

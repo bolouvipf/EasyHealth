@@ -172,7 +172,7 @@ function AgentDashboard() {
   const [records, setRecords] = useState<PatientRecord[]>([])
   const [stats, setStats] = useState<any>(null)
   const [showCreate, setShowCreate] = useState(false)
-  const [form, setForm] = useState({ nom: "", prenom: "", dateNaissance: "", sexe: "", telephone: "", adresse: "", profession: "", consentGiven: false })
+  const [form, setForm] = useState({ nom: "", prenom: "", dateNaissance: "", sexe: "", telephone: "", adresse: "", profession: "", npi: "", consentGiven: false })
 
   useEffect(() => {
     patientsApi.findAll().then(setRecords).catch(console.error)
@@ -185,7 +185,7 @@ function AgentDashboard() {
       const record = await patientsApi.create(form)
       setRecords([...records, record])
       setShowCreate(false)
-      setForm({ nom: "", prenom: "", dateNaissance: "", sexe: "", telephone: "", adresse: "", profession: "", consentGiven: false })
+      setForm({ nom: "", prenom: "", dateNaissance: "", sexe: "", telephone: "", adresse: "", profession: "", npi: "", consentGiven: false })
     } catch (err) {
       console.error(err)
     }
@@ -239,6 +239,10 @@ function AgentDashboard() {
           <div className="form-group">
             <label>Adresse</label>
             <input value={form.adresse} onChange={(e) => setForm({ ...form, adresse: e.target.value })} />
+          </div>
+          <div className="form-group">
+            <label>NPI (ANIP Bénin) <span className="optional-badge">facultatif</span></label>
+            <input value={form.npi} onChange={(e) => setForm({ ...form, npi: e.target.value })} placeholder="Numéro Personnel d'Identification" />
           </div>
           <div className="form-group">
             <label>

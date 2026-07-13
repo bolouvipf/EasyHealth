@@ -40,6 +40,11 @@ export class CreatePatientDto {
   @IsString()
   profession?: string
 
+  @ApiPropertyOptional({ example: "0123456789" })
+  @IsOptional()
+  @IsString()
+  npi?: string
+
   @ApiPropertyOptional()
   @IsOptional()
   @IsBoolean()

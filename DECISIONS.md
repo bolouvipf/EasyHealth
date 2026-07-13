@@ -169,6 +169,81 @@ Ajout d'un `PaginationDto` partagé (`common/dto/pagination.dto.ts`) avec `page`
 ### Prochaines langues
 - **Fon (fon)** et **Yoruba (yo)** : nécessite des locuteurs natifs pour les traductions.
 
+## Corrections sécurité — 07/2026
+
+### Chiffrement du flux sync (clinical-entry-sync)
+- **Problème** : Les entrées cliniques poussées via `POST /sync/push` n'étaient pas chiffrées dans `ClinicalEntrySyncService.processPushOperation()`, alors que le web API (`PatientService.addClinicalEntry`) chiffrait avec AES-256-GCM. Incohérence ouvrant une fuite de données via le endpoint sync.
+- **Décision** : Injection de `EncryptionService` dans `ClinicalEntrySyncService`. Le `content` est maintenant chiffré avec `this.encryptionService.encrypt(...)` avant insertion en base, comme côté web API.
+- **Fichier** : `sync/clinical-entry-sync.service.ts`
+
+### Correction getEntriesSince (bug pull sync)
+- **Problème** : `getEntriesSince()` utilisait `{ createdAt: since as any }` (égalité stricte) au lieu de `MoreThanOrEqual(since)`. Certaines entrées horodatées à la même microseconde que `since` pouvaient être manquées.
+- **Décision** : Remplacement par `where: { createdAt: MoreThanOrEqual(since) }`.
+- **Fichier** : `sync/clinical-entry-sync.service.ts`
+
+### Chiffrement des données démographiques patient
+- **Problème** : Les champs sensibles (`nom`, `prenom`, `adresse`, `telephone`) étaient stockés en clair dans `patient_records`. Conformité APDP insuffisante en cas de fuite de la base.
+- **Décision** :
+  - Ajout d'une colonne `encryptedData` (TEXT) dans `patient_records`.
+  - Les champs sensibles sont chiffrés en JSON via AES-256-GCM et stockés dans cette colonne à chaque création/modification (`PatientService.create`, `PatientService.update`, `AuthService.register`).
+  - En lecture (`findOne`, `findAll`, `findMine`), `decryptPatientRecord()` déchiffre `encryptedData` et peuple les champs dans l'objet retourné.
+  - Les champs non sensibles (`groupeSanguin`, `profession`, `dateNaissance`, `sexe`) restent en clair pour permettre la recherche et l'indexation.
+  - Les colonnes en clair (`nom`, `prenom`, `adresse`, `telephone`) sont conservées en base pour la rétrocompatibilité et la recherche, mais les réponses API retournent systématiquement les valeurs déchiffrées depuis `encryptedData` (defense in depth).
+- **Fichiers** : `patient.entity.ts`, `patient.service.ts`, `auth.service.ts`
+
+### Validation jti avec blacklist mémoire
+- **Problème** : Le `jti` (UUID v4) était présent dans le payload JWT mais jamais validé côté serveur. Impossible de révoquer un JWT individuellement sans recourir à `logoutAll` (brutal).
+- **Décision** :
+  - Création de `TokenBlacklistService` (Set<string> en mémoire) avec méthodes `add(jti)`, `has(jti)`, `clear()`.
+  - `JwtStrategy.validate()` vérifie que `payload.jti` n'est pas dans la blacklist → `UnauthorizedException` si blacklisté.
+  - `POST /auth/logout` blackliste le jti du JWT courant via le décorateur `@CurrentUser().jti`.
+  - `POST /auth/logout-all` vide la blacklist (le tokenVersion gère déjà l'invalidation massive).
+  - Solution en mémoire : les JTI blacklistés sont perdus au redémarrage du serveur. Acceptable pour le MVP ; une solution Redis sera envisagée en production.
+- **Fichiers** : `blacklist.service.ts` (nouveau), `jwt.strategy.ts`, `auth.service.ts`, `auth.controller.ts`, `auth.module.ts`
+
+## Spécialités médicales (Neurologie, Cardiologie) — 07/2026
+
+### Problème
+Le dossier patient affichait toutes les entrées cliniques sans distinction de spécialité. Impossible de filtrer les notes par service (Neurologie, Cardiologie) dans l'espace patient.
+
+### Décision
+- Ajout d'un enum `Specialty` dans `clinical-entry.entity.ts` : `GENERALE`, `NEUROLOGIE`, `CARDIOLOGIE`.
+- Nouvelle colonne `specialty` (simple-enum, défaut `GENERALE`) dans la table `clinical_entries`.
+- Le `CreateClinicalEntryDto` accepte un champ `specialty` optionnel.
+- Le endpoint `GET /patients/:id/entries` supporte le filtre `?specialty=neurologie`.
+- Côté frontend (`PatientDetail.tsx`) : les entrées sont groupées par spécialité en sections repliables. "Générale" est dépliée par défaut ; les spécialités (Neurologie, Cardiologie) sont masquées et nécessitent un clic pour être dépliées.
+- L'enum et l'UI sont conçus pour être extensibles : ajouter une valeur à `Specialty` suffit pour qu'une nouvelle section apparaisse automatiquement dans l'interface.
+
+### Filtrage / groupement
+Le groupement par spécialité s'effectue **côté client** dans le dossier agrégé :
+1. Toutes les entrées cliniques du patient sont chargées via `GET /patients/:id/entries`.
+2. Le `useMemo` / `reduce` côté frontend groupe les entrées par `specialty`.
+3. Chaque groupe est affiché dans une section repliable avec son en-tête coloré.
+4. Pas de requête serveur supplémentaire — le filtrage se fait sur les entrées déjà chargées, ce qui permet le filtrage croisé et l'affichage multispecialty sans latence.
+
+### Fichiers
+- `clinical-entry.entity.ts` (enum + colonne)
+- `create-clinical-entry.dto.ts` (champ specialty)
+- `patient.service.ts` (filtre optionnel dans getClinicalEntries)
+- `patient.controller.ts` (paramètre query specialty)
+- Frontend : `PatientDetail.tsx` (groupement par spécialité, sections repliables)
+
+## NPI (Numéro Personnel d'Identification ANIP Bénin) — 07/2026
+
+### Problème
+Les patients béninois possèdent un identifiant unique délivré par l'ANIP (Agence Nationale d'Identification des Personnes). La plateforme ne permettait pas de le renseigner.
+
+### Décision
+- Ajout d'un champ `npi` (string, nullable) dans le `CreatePatientDto` et `RegisterDto`.
+- **Strictement facultatif** : jamais requis pour créer un compte, se connecter, ou utiliser une fonctionnalité quelconque.
+- Stocké **uniquement dans `encryptedData`** (chiffré AES-256-GCM), jamais en clair.
+- Pas de validation de format stricte pour l'instant. Le format standard ANIP est généralement un code alphanumérique (12 chiffres ou lettres/chiffres). Une validation pourra être ajoutée ultérieurement lorsque le format sera officiellement documenté.
+- Frontend : présent dans les formulaires d'inscription (`RegisterPage.tsx`) et de création/modification de dossier (`PatientDashboard.tsx`, `DashboardPage.tsx`, `PatientDetail.tsx`), avec la mention "facultatif".
+
+### Fichiers
+- Backend : `create-patient.dto.ts`, `register.dto.ts`, `auth.service.ts`, `patient.service.ts`, `patient.entity.ts`
+- Frontend : `RegisterPage.tsx`, `PatientDashboard.tsx`, `DashboardPage.tsx`, `PatientDetail.tsx`
+
 ## Décisions remises à plus tard
 - **Hébergement** : Local (hébergeur béninois certifié APDP) vs cloud international avec garanties contractuelles.
 - **Période gratuite B2C** : 3 ou 6 mois — nécessite validation commerciale.

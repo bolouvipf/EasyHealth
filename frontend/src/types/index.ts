@@ -30,6 +30,7 @@ export interface PatientRecord {
   telephone?: string
   adresse?: string
   profession?: string
+  npi?: string
   consentGiven: boolean
   consentDate?: string
   isActive: boolean
@@ -46,10 +47,13 @@ export interface ClinicalEntry {
   entryType: string
   content: string
   metadata?: any
+  specialty?: string
   clientId?: string
   createdAt: string
   recordedAt?: string
 }
+
+export type Specialty = "generale" | "neurologie" | "cardiologie"
 
 export interface SharingCodeResponse {
   code: string

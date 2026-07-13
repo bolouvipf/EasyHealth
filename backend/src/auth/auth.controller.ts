@@ -53,9 +53,9 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Post("logout")
   @ApiBearerAuth()
-  @ApiOperation({ summary: "Révoquer le refresh token" })
-  logout(@Body("refreshToken") refreshToken: string) {
-    return this.authService.logout(refreshToken)
+  @ApiOperation({ summary: "Révoquer le refresh token et blacklister le JWT" })
+  logout(@Body("refreshToken") refreshToken: string, @CurrentUser() user: any) {
+    return this.authService.logout(refreshToken, user.jti)
   }
 
   @UseGuards(JwtAuthGuard)

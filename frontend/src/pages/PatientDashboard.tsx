@@ -10,7 +10,7 @@ export default function PatientDashboard() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const [showCreate, setShowCreate] = useState(false)
-  const [form, setForm] = useState({ nom: "", prenom: "", dateNaissance: "", sexe: "", telephone: "", adresse: "", profession: "", consentGiven: false })
+  const [form, setForm] = useState({ nom: "", prenom: "", dateNaissance: "", sexe: "", telephone: "", adresse: "", profession: "", npi: "", consentGiven: false })
 
   useEffect(() => {
     patientsApi.findMine().then(setRecords).catch(console.error)
@@ -26,7 +26,7 @@ export default function PatientDashboard() {
       const record = await patientsApi.create(form)
       setRecords([...records, record])
       setShowCreate(false)
-      setForm({ nom: "", prenom: "", dateNaissance: "", sexe: "", telephone: "", adresse: "", profession: "", consentGiven: false })
+      setForm({ nom: "", prenom: "", dateNaissance: "", sexe: "", telephone: "", adresse: "", profession: "", npi: "", consentGiven: false })
     } catch (err) {
       console.error(err)
     }
@@ -79,6 +79,10 @@ export default function PatientDashboard() {
           <div className="form-group">
             <label>Adresse</label>
             <input value={form.adresse} onChange={(e) => setForm({ ...form, adresse: e.target.value })} />
+          </div>
+          <div className="form-group">
+            <label>NPI (ANIP Bénin) <span className="optional-badge">facultatif</span></label>
+            <input value={form.npi} onChange={(e) => setForm({ ...form, npi: e.target.value })} placeholder="Numéro Personnel d'Identification" />
           </div>
           <div className="form-group">
             <label>

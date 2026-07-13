@@ -7,6 +7,7 @@ import { AuthService } from "./auth.service"
 import { AuthController } from "./auth.controller"
 import { AdminController } from "./admin.controller"
 import { JwtStrategy } from "./strategies/jwt.strategy"
+import { TokenBlacklistService } from "./blacklist.service"
 import { User } from "./user.entity"
 import { PasswordResetToken } from "./password-reset.entity"
 import { RefreshToken } from "./refresh-token.entity"
@@ -36,7 +37,7 @@ import { ProfessionalModule } from "../professionals/professional.module"
     ProfessionalModule,
   ],
   controllers: [AuthController, AdminController],
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService, JwtStrategy, TokenBlacklistService],
   exports: [AuthService, JwtModule, PassportModule],
 })
 export class AuthModule {}

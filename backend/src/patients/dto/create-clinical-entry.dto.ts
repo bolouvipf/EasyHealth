@@ -1,5 +1,6 @@
-import { IsString, IsOptional, IsDateString, IsObject } from "class-validator"
+import { IsString, IsOptional, IsDateString, IsObject, IsEnum } from "class-validator"
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger"
+import { Specialty } from "../clinical-entry.entity"
 
 export class CreateClinicalEntryDto {
   @ApiProperty({ example: "CONSULTATION" })
@@ -9,6 +10,11 @@ export class CreateClinicalEntryDto {
   @ApiProperty({ example: "Patient présente une fièvre persistante..." })
   @IsString()
   content: string
+
+  @ApiPropertyOptional({ enum: Specialty, example: Specialty.GENERALE })
+  @IsOptional()
+  @IsEnum(Specialty)
+  specialty?: Specialty
 
   @ApiPropertyOptional()
   @IsOptional()

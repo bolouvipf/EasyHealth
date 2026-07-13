@@ -2,7 +2,7 @@ import { Injectable, ForbiddenException, NotFoundException } from "@nestjs/commo
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository, IsNull } from "typeorm"
 import { PatientRecord } from "./patient.entity"
-import { ClinicalEntry, ClinicalEntryType } from "./clinical-entry.entity"
+import { ClinicalEntry, ClinicalEntryType, Specialty } from "./clinical-entry.entity"
 import { CreatePatientDto } from "./dto/create-patient.dto"
 import { UpdatePatientDto } from "./dto/update-patient.dto"
 import { CreateClinicalEntryDto } from "./dto/create-clinical-entry.dto"
@@ -29,6 +29,31 @@ export class PatientService {
     private readonly encryptionService: EncryptionService,
   ) {}
 
+  private encryptPatientData(dto: { nom?: string; prenom?: string; adresse?: string; telephone?: string; npi?: string }): string | undefined {
+    const sensitive: Record<string, string> = {}
+    if (dto.nom !== undefined) sensitive.nom = dto.nom
+    if (dto.prenom !== undefined) sensitive.prenom = dto.prenom
+    if (dto.adresse !== undefined) sensitive.adresse = dto.adresse
+    if (dto.telephone !== undefined) sensitive.telephone = dto.telephone
+    if (dto.npi !== undefined) sensitive.npi = dto.npi
+    if (Object.keys(sensitive).length === 0) return undefined
+    return this.encryptionService.encrypt(JSON.stringify(sensitive))
+  }
+
+  private decryptPatientRecord(record: PatientRecord): PatientRecord {
+    if (record.encryptedData && this.encryptionService.isEncrypted(record.encryptedData)) {
+      try {
+        const decrypted = JSON.parse(this.encryptionService.decrypt(record.encryptedData))
+        if (decrypted.nom !== undefined) record.nom = decrypted.nom
+        if (decrypted.prenom !== undefined) record.prenom = decrypted.prenom
+        if (decrypted.adresse !== undefined) record.adresse = decrypted.adresse
+        if (decrypted.telephone !== undefined) record.telephone = decrypted.telephone
+        if (decrypted.npi !== undefined) (record as any).npi = decrypted.npi
+      } catch {}
+    }
+    return record
+  }
+
   async create(dto: CreatePatientDto, userId: string, userRole: string, ip?: string) {
     if (userRole === UserRole.PATIENT) {
       throw new ForbiddenException("Les patients ne peuvent pas créer de dossiers")
@@ -43,6 +68,7 @@ export class PatientService {
       telephone: dto.telephone,
       adresse: dto.adresse,
       profession: dto.profession,
+      encryptedData: this.encryptPatientData(dto),
       createdById: userId,
       consentGiven: dto.consentGiven ?? false,
       consentDate: dto.consentGiven ? new Date() : null,
@@ -63,11 +89,12 @@ export class PatientService {
   }
 
   async findMine(userId: string): Promise<PatientRecord[]> {
-    return this.patientRepository.find({
+    const records = await this.patientRepository.find({
       where: { userId, isActive: true },
       relations: ["clinicalEntries"],
       order: { createdAt: "DESC" },
     })
+    return records.map((r) => this.decryptPatientRecord(r))
   }
 
   async findAll(userId: string, userRole: string, pagination?: PaginationDto): Promise<PaginatedResult<PatientRecord>> {
@@ -88,7 +115,7 @@ export class PatientService {
     })
 
     return {
-      data,
+      data: data.map((r) => this.decryptPatientRecord(r)),
       meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
     }
   }
@@ -127,7 +154,7 @@ export class PatientService {
       ipAddress: ip,
     })
 
-    return record
+    return this.decryptPatientRecord(record)
   }
 
   async update(id: string, dto: UpdatePatientDto, userId: string, userRole: string, ip?: string) {
@@ -155,6 +182,9 @@ export class PatientService {
       record.consentDate = dto.consentGiven ? new Date() : null
     }
 
+    const encrypted = this.encryptPatientData(dto)
+    if (encrypted) record.encryptedData = encrypted
+
     await this.patientRepository.save(record)
 
     await this.auditService.log({
@@ -165,7 +195,7 @@ export class PatientService {
       ipAddress: ip,
     })
 
-    return record
+    return this.decryptPatientRecord(record)
   }
 
   async remove(id: string, userId: string, ip?: string) {
@@ -211,6 +241,7 @@ export class PatientService {
     entry.entryType = dto.entryType as ClinicalEntryType
     entry.content = encryptedContent
     entry.metadata = Object.keys(metadata).length ? JSON.stringify(metadata) : undefined
+    entry.specialty = dto.specialty || Specialty.GENERALE
     entry.clientId = dto.clientId as string
     entry.recordedAt = dto.recordedAt ? new Date(dto.recordedAt) : new Date()
 
@@ -232,6 +263,7 @@ export class PatientService {
     userId: string,
     userRole: string,
     pagination?: PaginationDto,
+    specialty?: Specialty,
   ): Promise<PaginatedResult<ClinicalEntry>> {
     const record = await this.patientRepository.findOne({ where: { id: patientRecordId, isActive: true } })
     if (!record) throw new NotFoundException("Dossier patient introuvable")
@@ -241,8 +273,11 @@ export class PatientService {
     const limit = pagination?.limit ?? 20
     const skip = (page - 1) * limit
 
+    const where: any = { patientRecordId }
+    if (specialty) where.specialty = specialty
+
     const [entries, total] = await this.clinicalEntryRepository.findAndCount({
-      where: { patientRecordId },
+      where,
       order: { createdAt: "ASC" },
       relations: ["author"],
       skip,

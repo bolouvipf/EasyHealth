@@ -84,8 +84,8 @@ export class PatientController {
   }
 
   @Get(":id/entries")
-  @ApiOperation({ summary: "Lister les entrées cliniques d'un dossier" })
-  getClinicalEntries(@Param("id") id: string, @CurrentUser() user: any, @Query() pagination: PaginationDto) {
-    return this.patientService.getClinicalEntries(id, user.sub, user.role, pagination)
+  @ApiOperation({ summary: "Lister les entrées cliniques d'un dossier (filtrable par spécialité avec ?specialty=neurologie)" })
+  getClinicalEntries(@Param("id") id: string, @CurrentUser() user: any, @Query() pagination: PaginationDto, @Query("specialty") specialty?: string) {
+    return this.patientService.getClinicalEntries(id, user.sub, user.role, pagination, specialty as any)
   }
 }

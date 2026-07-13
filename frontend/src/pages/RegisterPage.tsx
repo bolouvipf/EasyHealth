@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom"
 import { auth as authApi } from "../services/api"
 
 export default function RegisterPage() {
-  const [form, setForm] = useState({ email: "", password: "", nom: "", prenom: "", role: "patient", telephone: "", professionalLicenseNumber: "", establishment: "" })
+  const [form, setForm] = useState({ email: "", password: "", nom: "", prenom: "", role: "patient", telephone: "", npi: "", professionalLicenseNumber: "", establishment: "" })
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
@@ -101,6 +101,10 @@ export default function RegisterPage() {
           <div className="form-group">
             <label>Téléphone</label>
             <input value={form.telephone} onChange={(e) => setForm({ ...form, telephone: e.target.value })} />
+          </div>
+          <div className="form-group">
+            <label>NPI (ANIP Bénin) <span className="optional-badge">facultatif</span></label>
+            <input value={form.npi} onChange={(e) => setForm({ ...form, npi: e.target.value })} placeholder="Numéro Personnel d'Identification" />
           </div>
           {form.role !== "patient" && (
             <>

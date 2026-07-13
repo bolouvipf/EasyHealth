@@ -42,6 +42,9 @@ export class PatientRecord {
   @Column({ nullable: true })
   profession: string
 
+  @Column({ type: "text", nullable: true })
+  encryptedData?: string
+
   @Column({ default: false })
   consentGiven: boolean
 

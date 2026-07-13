@@ -12,6 +12,12 @@ export enum ClinicalEntryType {
   TRAITEMENT = "traitement",
 }
 
+export enum Specialty {
+  GENERALE = "generale",
+  NEUROLOGIE = "neurologie",
+  CARDIOLOGIE = "cardiologie",
+}
+
 @Entity("clinical_entries")
 export class ClinicalEntry {
   @PrimaryGeneratedColumn("uuid")
@@ -39,6 +45,9 @@ export class ClinicalEntry {
 
   @Column({ type: "text", nullable: true })
   metadata?: string
+
+  @Column({ type: "simple-enum", enum: Specialty, default: Specialty.GENERALE })
+  specialty: Specialty
 
   @Column({ type: "varchar", nullable: true })
   clientId?: string

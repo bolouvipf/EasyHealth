@@ -23,6 +23,8 @@ import { AuditAction } from "../audit/audit.entity"
 import { ProfessionalService } from "../professionals/professional.service"
 import { PatientRecord } from "../patients/patient.entity"
 import { MailService } from "../mail/mail.service"
+import { TokenBlacklistService } from "./blacklist.service"
+import { EncryptionService } from "../crypto/encryption.service"
 
 const MAX_FAILED_ATTEMPTS = 5
 const LOCKOUT_MINUTES = 15
@@ -46,6 +48,8 @@ export class AuthService {
     private readonly professionalService: ProfessionalService,
     private readonly dataSource: DataSource,
     private readonly mailService: MailService,
+    private readonly blacklistService: TokenBlacklistService,
+    private readonly encryptionService: EncryptionService,
   ) {}
 
   async getStats() {
@@ -101,11 +105,15 @@ export class AuthService {
     await this.userRepository.save(user)
 
     if (user.role === UserRole.PATIENT) {
+      const sensitiveData: Record<string, string> = { nom: dto.nom, prenom: dto.prenom }
+      if (dto.npi) sensitiveData.npi = dto.npi
+
       const record = this.patientRecordRepository.create({
         nom: dto.nom,
         prenom: dto.prenom,
         userId: user.id,
         isActive: true,
+        encryptedData: this.encryptionService.encrypt(JSON.stringify(sensitiveData)),
       })
       await this.patientRecordRepository.save(record)
     }
@@ -317,15 +325,17 @@ export class AuthService {
     return { accessToken, refreshToken: newRefreshToken }
   }
 
-  async logout(rawRefreshToken: string) {
+  async logout(rawRefreshToken: string, jti?: string) {
     if (!rawRefreshToken) return
     const tokenHash = crypto.createHash("sha256").update(rawRefreshToken).digest("hex")
     await this.refreshTokenRepository.update({ tokenHash, isRevoked: false }, { isRevoked: true })
+    if (jti) this.blacklistService.add(jti)
   }
 
   async logoutAll(userId: string) {
     await this.refreshTokenRepository.update({ user: { id: userId }, isRevoked: false }, { isRevoked: true })
     await this.userRepository.increment({ id: userId }, "tokenVersion", 1)
+    this.blacklistService.clear()
   }
 
   sanitizeUser(user: User) {
