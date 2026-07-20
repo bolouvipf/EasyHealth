@@ -72,7 +72,7 @@ const steps = [
     body: (
       <>
         <ul>
-          <li>Ne scannez que des codes officiels fournis par le patient en consultation ;</li>
+          <li>Ne saisissez que des codes officiels fournis par le patient en consultation ;</li>
           <li>Limitez la durée d'accès au strict nécessaire ;</li>
           <li>Ne communiquez jamais vos identifiants professionnels ;</li>
           <li>Respectez la loi sur la protection des données (APDP / RGPD).</li>

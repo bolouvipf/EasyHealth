@@ -40,7 +40,7 @@ const steps = [
           (par exemple 1 heure).
         </p>
         <p>
-          Le médecin le scanne avec son application : il accède à votre dossier le temps que vous
+          Le médecin le saisit dans son application : il accède à votre dossier le temps que vous
           avez autorisé, puis l'accès se ferme automatiquement.
         </p>
       </>
