@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 import { useAuth } from "../hooks/useAuth"
 import { useLanguage } from "../i18n/LanguageContext"
@@ -12,48 +12,6 @@ interface PatientData {
   conditions?: string[]
   medications?: string[]
   lastVisit: string
-}
-
-function VisualCode({ value, size = 180 }: { value: string; size?: number }) {
-  const cells = 25
-  const grid = useMemo(() => {
-    let seed = 0
-    for (const ch of value) seed = (seed * 31 + ch.charCodeAt(0)) >>> 0
-    const rand = () => {
-      seed = (seed * 1103515245 + 12345) & 0x7fffffff
-      return seed / 0x7fffffff
-    }
-    const m: boolean[][] = Array.from({ length: cells }, () =>
-      Array.from({ length: cells }, () => rand() > 0.5)
-    )
-    const placeFinder = (r: number, c: number) => {
-      for (let i = 0; i < 7; i++) {
-        for (let j = 0; j < 7; j++) {
-          const edge = i === 0 || i === 6 || j === 0 || j === 6
-          const inner = i >= 2 && i <= 4 && j >= 2 && j <= 4
-          m[r + i][c + j] = edge || inner
-        }
-      }
-    }
-    placeFinder(0, 0)
-    placeFinder(0, cells - 7)
-    placeFinder(cells - 7, 0)
-    return m
-  }, [value])
-
-  const cell = size / cells
-  return (
-    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="code-svg" role="img" aria-label="Code temporaire">
-      <rect width={size} height={size} fill="#ffffff" rx={10} />
-      <g fill="#0f3e2e">
-        {grid.map((row, r) =>
-          row.map((on, c) =>
-            on ? <rect key={`${r}-${c}`} x={c * cell} y={r * cell} width={cell} height={cell} /> : null
-          )
-        )}
-      </g>
-    </svg>
-  )
 }
 
 function FloatingNav({ scrollTo }: { scrollTo: (id: string) => void }) {
@@ -126,7 +84,7 @@ function HeroSection({ scrollTo }: { scrollTo: (id: string) => void }) {
           </h1>
           <p className="lead">
             Votre dossier médical, sécurisé et accessible partout. Patients, médecins et
-            établissements réunis en un seul scan.
+            établissements connectés en toute simplicité.
           </p>
           <div className="hero-actions">
             <Link to="/register" className="btn btn-primary">
@@ -146,12 +104,14 @@ function HeroSection({ scrollTo }: { scrollTo: (id: string) => void }) {
         <div className={`hero-visual ${animate ? "is-visible" : ""}`}>
           <div className="hero-media">
             <div className="hero-fallback">
-              <VisualCode value="EASYHEALTH" size={130} />
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              </svg>
               <span>Dossier de santé sécurisé</span>
             </div>
             <img
               src="/doctor-hero.png"
-              alt="Code de partage de dossier patient EasyHealth"
+              alt="Médecin consultant le dossier patient"
               className="hero-img"
               onError={(e) => (e.currentTarget.style.display = "none")}
             />
@@ -167,7 +127,7 @@ function DoctorScanAnimation() {
   const [code, setCode] = useState("")
   const [patient, setPatient] = useState<PatientData | null>(null)
 
-  const phases = ["Accueil", "Scan en cours", "Accès autorisé", "Dossier ouvert"]
+  const phases = ["Accueil", "Code généré", "Accès autorisé", "Dossier ouvert"]
 
   useEffect(() => {
     let active = true
@@ -229,12 +189,9 @@ function DoctorScanAnimation() {
         )}
 
         {phase === 1 && (
-          <div className="screen-pad scan-pad">
-            <div className="scanner">
-              <div className="scanner-line" />
-              <VisualCode value={code || "EASYHEALTH"} size={150} />
-            </div>
-            <p className="scan-hint">Scan du code patient…</p>
+          <div className="screen-pad center">
+            <div className="big-code-display">{code || "EH-XXXXXXXX"}</div>
+            <p className="scan-hint">Code de partage généré</p>
           </div>
         )}
 
@@ -313,7 +270,7 @@ function DemoSection() {
         <header className="section-head">
           <span className="eyebrow">Démonstration</span>
           <h2>Voyez EasyHealth en action</h2>
-          <p>Scannez le code pour simuler l'accès au dossier d'un patient.</p>
+          <p>Utilisez la démo pour simuler l'accès au dossier d'un patient.</p>
         </header>
 
         <div className="demo-grid">
@@ -359,18 +316,13 @@ function DemoSection() {
             ) : (
               <div className="demo-idle">
                 <button className="btn btn-primary full" onClick={runScan} disabled={loading}>
-                  {loading ? "Scan en cours…" : "Lancer le scanner"}
+                  {loading ? "Vérification…" : "Accéder à la démo"}
                 </button>
                 <p className="hint">Le patient contrôle l'accès et sa durée.</p>
               </div>
             )}
           </div>
 
-          <div className="demo-card code-card">
-            <div className="card-label">Code patient de démo</div>
-            <VisualCode value="EASYHEALTH-DEMO" size={200} />
-            <p className="hint">Valide 1 heure · Usage unique</p>
-          </div>
         </div>
       </div>
     </section>
