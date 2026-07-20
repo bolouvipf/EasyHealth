@@ -36,7 +36,7 @@ const steps = [
     body: (
       <>
         <p>
-          Lors de la consultation, demandez au patient son <strong>code QR temporaire</strong>.
+          Lors de la consultation, demandez au patient son <strong>code temporaire</strong>.
           Scannez-le avec l'application EasyHealth Pro : le dossier s'ouvre pour la durée que le
           patient a fixée (généralement 1 heure).
         </p>

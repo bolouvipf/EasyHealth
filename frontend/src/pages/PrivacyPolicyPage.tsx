@@ -64,7 +64,7 @@ const sections = [
       <>
         <p>
           Vos données de santé ne sont jamais vendues. Elles ne sont partagées qu'avec les
-          professionnels de santé que <strong>vous</strong> autorisez explicitement, via un code QR
+          professionnels de santé que <strong>vous</strong> autorisez explicitement, via un code
           temporaire et à usage unique. Chaque partage fait l'objet d'une entrée dans le journal
           d'audit, consultable par vous.
         </p>

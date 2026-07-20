@@ -610,13 +610,13 @@
 .tag.warn {
   background: var(--warn-soft);
 }
-.qr-card {
+.code-card {
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
 }
-.qr-svg {
+.code-svg {
   border-radius: 12px;
   box-shadow: var(--shadow);
 }

@@ -5,14 +5,14 @@ import "./LegalPage.css"
 const faqs = [
   {
     q: "Qu'est-ce qu'EasyHealth ?",
-    a: "EasyHealth est le Dossier de Santé Partagé du Bénin. Il réunit en un seul endroit sécurisé vos antécédents, traitements, allergies et examens, et permet aux professionnels de santé autorisés d'y accéder par un simple scan de QR code.",
+    a: "EasyHealth est le Dossier de Santé Partagé du Bénin. Il réunit en un seul endroit sécurisé vos antécédents, traitements, allergies et examens, et permet aux professionnels de santé autorisés d'y accéder par un simple code temporaire.",
   },
   {
     q: "Mes données sont-elles sécurisées ?",
     a: "Oui. Vos données sont chiffrées (AES-256), hébergées localement au Bénin et chaque accès est horodaté et tracé dans un journal d'audit. EasyHealth est conçu pour être conforme à l'APDP et au RGPD.",
   },
   {
-    q: "Comment fonctionne le partage par QR code ?",
+    q: "Comment fonctionne le partage par code temporaire ?",
     a: "Vous générez depuis l'application un code temporaire, à usage unique et limité dans le temps (par exemple 1 heure). Vous décidez à qui vous le donnez et pour quelle durée. Passé ce délai, le code ne donne plus accès à rien.",
   },
   {

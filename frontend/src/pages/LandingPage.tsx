@@ -14,7 +14,7 @@ interface PatientData {
   lastVisit: string
 }
 
-function QrCode({ value, size = 180 }: { value: string; size?: number }) {
+function VisualCode({ value, size = 180 }: { value: string; size?: number }) {
   const cells = 25
   const grid = useMemo(() => {
     let seed = 0
@@ -43,7 +43,7 @@ function QrCode({ value, size = 180 }: { value: string; size?: number }) {
 
   const cell = size / cells
   return (
-    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="qr-svg" role="img" aria-label="QR code">
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="code-svg" role="img" aria-label="Code temporaire">
       <rect width={size} height={size} fill="#ffffff" rx={10} />
       <g fill="#0f3e2e">
         {grid.map((row, r) =>
@@ -146,12 +146,12 @@ function HeroSection({ scrollTo }: { scrollTo: (id: string) => void }) {
         <div className={`hero-visual ${animate ? "is-visible" : ""}`}>
           <div className="hero-media">
             <div className="hero-fallback">
-              <QrCode value="EASYHEALTH" size={130} />
+              <VisualCode value="EASYHEALTH" size={130} />
               <span>Dossier de santé sécurisé</span>
             </div>
             <img
               src="/doctor-hero.png"
-              alt="Médecin scannant le QR code d'un patient avec EasyHealth"
+              alt="Code de partage de dossier patient EasyHealth"
               className="hero-img"
               onError={(e) => (e.currentTarget.style.display = "none")}
             />
@@ -164,7 +164,7 @@ function HeroSection({ scrollTo }: { scrollTo: (id: string) => void }) {
 
 function DoctorScanAnimation() {
   const [phase, setPhase] = useState(0)
-  const [qrCode, setQrCode] = useState("")
+  const [code, setCode] = useState("")
   const [patient, setPatient] = useState<PatientData | null>(null)
 
   const phases = ["Accueil", "Scan en cours", "Accès autorisé", "Dossier ouvert"]
@@ -177,7 +177,7 @@ function DoctorScanAnimation() {
           if (!active) return
           setPhase(i)
           if (i === 1) {
-            setQrCode("EH-" + Math.random().toString(36).slice(2, 10).toUpperCase())
+            setCode("EH-" + Math.random().toString(36).slice(2, 10).toUpperCase())
             await new Promise((r) => setTimeout(r, 1600))
             setPatient({
               name: "Marie KOUASSI",
@@ -219,7 +219,7 @@ function DoctorScanAnimation() {
             </div>
             <div className="home-card">
               <h4>Partage sécurisé</h4>
-              <p>Code QR temporaire à usage unique</p>
+              <p>Code temporaire à usage unique</p>
             </div>
             <div className="home-card">
               <h4>Journal d'audit</h4>
@@ -232,7 +232,7 @@ function DoctorScanAnimation() {
           <div className="screen-pad scan-pad">
             <div className="scanner">
               <div className="scanner-line" />
-              <QrCode value={qrCode || "EASYHEALTH"} size={150} />
+              <VisualCode value={code || "EASYHEALTH"} size={150} />
             </div>
             <p className="scan-hint">Scan du code patient…</p>
           </div>
@@ -366,9 +366,9 @@ function DemoSection() {
             )}
           </div>
 
-          <div className="demo-card qr-card">
+          <div className="demo-card code-card">
             <div className="card-label">Code patient de démo</div>
-            <QrCode value="EASYHEALTH-DEMO" size={200} />
+            <VisualCode value="EASYHEALTH-DEMO" size={200} />
             <p className="hint">Valide 1 heure · Usage unique</p>
           </div>
         </div>
@@ -392,7 +392,7 @@ function FeaturesSection() {
       ),
     },
     {
-      title: "Partage par QR code",
+      title: "Partage par code temporaire",
       desc: "Codes temporaires à usage unique. Le patient décide qui accède et pour combien de temps.",
       icon: (
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">

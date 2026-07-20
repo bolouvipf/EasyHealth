@@ -31,12 +31,12 @@ const steps = [
     ),
   },
   {
-    title: "3. Partager par QR code",
+    title: "3. Partager par code temporaire",
     body: (
       <>
         <p>
           Lors d'une consultation, ouvrez la fonction de partage depuis votre dossier. Un{' '}
-          <strong>code QR temporaire</strong> est généré, à usage unique et limité dans le temps
+          <strong>code temporaire</strong> est généré, à usage unique et limité dans le temps
           (par exemple 1 heure).
         </p>
         <p>
@@ -65,7 +65,7 @@ const steps = [
       <>
         <ul>
           <li>Utilisez un mot de passe unique et robuste pour EasyHealth ;</li>
-          <li>Ne laissez pas votre code QR visible au-delà de la consultation ;</li>
+          <li>Ne laissez pas votre code visible au-delà de la consultation ;</li>
           <li>Signalez tout accès inhabituel depuis le journal d'audit ;</li>
           <li>En cas de doute, contactez-nous à <strong>contact@easyhealth.bj</strong>.</li>
         </ul>
