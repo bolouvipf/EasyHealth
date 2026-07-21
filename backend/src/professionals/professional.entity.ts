@@ -28,8 +28,8 @@ export class ProfessionalVerification {
     @Column({ default: "pending" })
     status: string;
 
-    @Column({ nullable: true })
-    verifiedAt: Date;
+    @Column({ type: "text", nullable: true, transformer: { to: (v: Date | null | undefined) => v?.toISOString() ?? null, from: (v: string | null) => v ? new Date(v) : null } })
+    verifiedAt: Date | null;
 
     @Column({ nullable: true })
     verifiedById: string;

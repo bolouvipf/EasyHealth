@@ -28,8 +28,8 @@ export class PatientRecord {
   @Column()
   prenom: string
 
-  @Column({ nullable: true })
-  dateNaissance: Date
+  @Column({ type: "text", nullable: true, transformer: { to: (v: Date | null | undefined) => v?.toISOString() ?? null, from: (v: string | null) => v ? new Date(v) : null } })
+  dateNaissance: Date | null
 
   @Column({ nullable: true })
   sexe: string

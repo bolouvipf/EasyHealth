@@ -31,8 +31,8 @@ export class AccessGrant {
   @Column()
   expiresAt: Date
 
-  @Column({ nullable: true })
-  revokedAt: Date
+  @Column({ type: "text", nullable: true, transformer: { to: (v: Date | null | undefined) => v?.toISOString() ?? null, from: (v: string | null) => v ? new Date(v) : null } })
+  revokedAt: Date | null
 
   @CreateDateColumn()
   createdAt: Date

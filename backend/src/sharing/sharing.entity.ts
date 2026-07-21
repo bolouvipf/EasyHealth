@@ -29,8 +29,8 @@ export class SharingCode {
   @Column({ nullable: true })
   usedById: string
 
-  @Column({ nullable: true })
-  usedAt: Date
+  @Column({ type: "text", nullable: true, transformer: { to: (v: Date | null | undefined) => v?.toISOString() ?? null, from: (v: string | null) => v ? new Date(v) : null } })
+  usedAt: Date | null
 
   @Column()
   expiresAt: Date
