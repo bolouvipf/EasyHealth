@@ -52,7 +52,7 @@ export class PatientRecord {
   @Column({ default: false })
   consentGiven: boolean
 
-  @Column({ nullable: true })
+  @Column({ type: "text", nullable: true, transformer: { to: (v: Date | null) => v?.toISOString() ?? null, from: (v: string | null) => v ? new Date(v) : null } })
   consentDate: Date | null
 
   @Column({ default: false })

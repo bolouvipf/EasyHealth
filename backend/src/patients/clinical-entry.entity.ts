@@ -57,6 +57,6 @@ export class ClinicalEntry {
   @CreateDateColumn()
   createdAt: Date
 
-  @Column({ nullable: true })
+  @Column({ type: "text", nullable: true, transformer: { to: (v: Date | null | undefined) => v?.toISOString() ?? null, from: (v: string | null) => v ? new Date(v) : null } })
   recordedAt?: Date
 }

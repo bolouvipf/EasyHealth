@@ -52,7 +52,7 @@ export class User {
   @Column({ default: true })
   isActive: boolean
 
-  @Column({ nullable: true })
+  @Column({ type: "text", nullable: true, transformer: { to: (v: Date | null) => v?.toISOString() ?? null, from: (v: string | null) => v ? new Date(v) : null } })
   consentDate: Date | null
 
   @Column({ default: false })
@@ -64,10 +64,10 @@ export class User {
   @Column({ default: 0 })
   tokenVersion: number
 
-  @Column({ nullable: true })
+  @Column({ type: "text", nullable: true, transformer: { to: (v: Date | null) => v?.toISOString() ?? null, from: (v: string | null) => v ? new Date(v) : null } })
   lockedUntil: Date | null
 
-  @Column({ nullable: true })
+  @Column({ type: "text", nullable: true, transformer: { to: (v: Date | null) => v?.toISOString() ?? null, from: (v: string | null) => v ? new Date(v) : null } })
   lastLoginAt: Date | null
 
   @CreateDateColumn()
