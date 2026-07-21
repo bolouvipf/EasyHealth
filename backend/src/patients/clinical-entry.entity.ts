@@ -57,6 +57,6 @@ export class ClinicalEntry {
   @CreateDateColumn()
   createdAt: Date
 
-  @Column({ type: "timestamp", nullable: true })
+  @Column({ type: "datetime", nullable: true })
   recordedAt?: Date
 }

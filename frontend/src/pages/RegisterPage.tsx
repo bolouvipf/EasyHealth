@@ -1,6 +1,7 @@
 import { useState, FormEvent } from "react"
 import { useNavigate, Link } from "react-router-dom"
-import { auth as authApi } from "../services/api"
+import { auth as authApi, setStoredRefreshToken } from "../services/api"
+import { useAuth } from "../hooks/useAuth"
 
 export default function RegisterPage() {
   const [form, setForm] = useState({ email: "", password: "", nom: "", prenom: "", role: "patient", telephone: "", professionalLicenseNumber: "", establishment: "" })
@@ -9,6 +10,7 @@ export default function RegisterPage() {
   const [success, setSuccess] = useState("")
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
+  const { setUser, setToken } = useAuth()
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
@@ -19,14 +21,22 @@ export default function RegisterPage() {
       if (form.role !== "patient") {
         if (!form.professionalLicenseNumber.trim()) {
           setError("Le numéro d'enregistrement professionnel est requis.")
+          setLoading(false)
           return
         }
         if (!form.establishment.trim()) {
           setError("L'établissement est requis.")
+          setLoading(false)
           return
         }
       }
       const response = await authApi.register(form)
+      localStorage.setItem("easyhealth_token", response.accessToken)
+      localStorage.setItem("easyhealth_user", JSON.stringify(response.user))
+      localStorage.setItem("easyhealth_refresh", response.refreshToken)
+      setStoredRefreshToken(response.refreshToken)
+      setToken(response.accessToken)
+      setUser(response.user)
       if (response.user.role !== "patient" && response.user.professionalStatus === "pending") {
         setSuccess("Votre compte a été créé. Un administrateur doit valider votre inscription avant de pouvoir vous connecter.")
       } else {
