@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn, Index } from "typeorm"
 import { PatientRecord } from "./patient.entity"
 import { User } from "../auth/user.entity"
 
@@ -19,6 +19,8 @@ export enum Specialty {
 }
 
 @Entity("clinical_entries")
+@Index(["patientRecordId", "createdAt"])
+@Index(["authorId", "createdAt"])
 export class ClinicalEntry {
   @PrimaryGeneratedColumn("uuid")
   id: string

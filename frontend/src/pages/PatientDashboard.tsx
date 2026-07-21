@@ -7,14 +7,19 @@ import type { PatientRecord } from "../types"
 export default function PatientDashboard() {
   const [records, setRecords] = useState<PatientRecord[]>([])
   const [stats, setStats] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
   const { user } = useAuth()
   const navigate = useNavigate()
   const [showCreate, setShowCreate] = useState(false)
-  const [form, setForm] = useState({ nom: "", prenom: "", dateNaissance: "", sexe: "", telephone: "", adresse: "", profession: "", npi: "", consentGiven: false })
+  const [form, setForm] = useState({ nom: "", prenom: "", dateNaissance: "", sexe: "", telephone: "", adresse: "", profession: "", consentGiven: false })
 
   useEffect(() => {
-    patientsApi.findMine().then(setRecords).catch(console.error)
-    dashboardApi.getDashboard().then(setStats).catch(console.error)
+    setLoading(true)
+    const fetchRecords = user?.role === "patient" ? patientsApi.findMine : patientsApi.findAll
+    Promise.all([
+      fetchRecords().then(setRecords),
+      dashboardApi.getDashboard().then(setStats),
+    ]).catch(console.error).finally(() => setLoading(false))
   }, [])
 
   const canCreate = user?.role === "medecin" || user?.role === "infirmier" || user?.role === "admin"
@@ -26,7 +31,7 @@ export default function PatientDashboard() {
       const record = await patientsApi.create(form)
       setRecords([...records, record])
       setShowCreate(false)
-      setForm({ nom: "", prenom: "", dateNaissance: "", sexe: "", telephone: "", adresse: "", profession: "", npi: "", consentGiven: false })
+      setForm({ nom: "", prenom: "", dateNaissance: "", sexe: "", telephone: "", adresse: "", profession: "", consentGiven: false })
     } catch (err) {
       console.error(err)
     }
@@ -80,10 +85,7 @@ export default function PatientDashboard() {
             <label>Adresse</label>
             <input value={form.adresse} onChange={(e) => setForm({ ...form, adresse: e.target.value })} />
           </div>
-          <div className="form-group">
-            <label>NPI (ANIP Bénin) <span className="optional-badge">facultatif</span></label>
-            <input value={form.npi} onChange={(e) => setForm({ ...form, npi: e.target.value })} placeholder="Numéro Personnel d'Identification" />
-          </div>
+
           <div className="form-group">
             <label>
               <input type="checkbox" checked={form.consentGiven} onChange={(e) => setForm({ ...form, consentGiven: e.target.checked })} />
@@ -94,6 +96,9 @@ export default function PatientDashboard() {
         </form>
       )}
 
+      {loading ? (
+        <div className="loading"><div className="spinner"></div>Chargement des dossiers...</div>
+      ) : (
       <div className="patient-grid">
         {records.map((record) => (
           <div key={record.id} className="card patient-card" onClick={() => navigate(isPatient ? `/share/${record.id}` : `/patients/${record.id}`)}>
@@ -107,6 +112,7 @@ export default function PatientDashboard() {
         ))}
         {records.length === 0 && <p className="empty-state">Aucun dossier patient pour le moment.</p>}
       </div>
+      )}
     </div>
   )
 }

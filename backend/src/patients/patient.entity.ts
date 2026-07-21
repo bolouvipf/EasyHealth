@@ -5,8 +5,9 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
-  OneToMany,
   JoinColumn,
+  OneToMany,
+  Index,
 } from "typeorm"
 import { User } from "../auth/user.entity"
 import { AccessLog } from "../audit/audit.entity"
@@ -14,6 +15,9 @@ import { SharingCode } from "../sharing/sharing.entity"
 import { ClinicalEntry } from "./clinical-entry.entity"
 
 @Entity("patient_records")
+@Index(["isActive", "createdAt"])
+@Index(["createdById", "isActive"])
+@Index(["userId", "isActive"])
 export class PatientRecord {
   @PrimaryGeneratedColumn("uuid")
   id: string

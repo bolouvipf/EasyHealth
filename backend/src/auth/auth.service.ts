@@ -97,8 +97,14 @@ export class AuthService {
     const hashedPassword = await bcrypt.hash(dto.password, salt)
 
     const user = this.userRepository.create({
-      ...dto,
+      email: dto.email,
       password: hashedPassword,
+      nom: dto.nom,
+      prenom: dto.prenom,
+      role: dto.role,
+      telephone: dto.telephone,
+      professionalLicenseNumber: dto.professionalLicenseNumber,
+      hospital: dto.establishment,
       professionalStatus: dto.role === UserRole.PATIENT ? "verified" : "pending",
     })
 
@@ -106,7 +112,6 @@ export class AuthService {
 
     if (user.role === UserRole.PATIENT) {
       const sensitiveData: Record<string, string> = { nom: dto.nom, prenom: dto.prenom }
-      if (dto.npi) sensitiveData.npi = dto.npi
 
       const record = this.patientRecordRepository.create({
         nom: dto.nom,

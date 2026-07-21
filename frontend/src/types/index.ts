@@ -30,7 +30,6 @@ export interface PatientRecord {
   telephone?: string
   adresse?: string
   profession?: string
-  npi?: string
   consentGiven: boolean
   consentDate?: string
   isActive: boolean

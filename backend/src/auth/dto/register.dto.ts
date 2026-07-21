@@ -29,11 +29,6 @@ export class RegisterDto {
   @IsString()
   telephone?: string
 
-  @ApiPropertyOptional({ example: "0123456789", description: "Numéro Personnel d'Identification (ANIP Bénin) — strictement facultatif" })
-  @IsOptional()
-  @IsString()
-  npi?: string
-
   @ApiPropertyOptional({ example: "MED-2024-001234" })
   @ValidateIf((o: RegisterDto) => o.role && o.role !== UserRole.PATIENT)
   @IsString()

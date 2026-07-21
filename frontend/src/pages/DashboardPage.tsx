@@ -54,12 +54,18 @@ function MedecinDashboard() {
   const navigate = useNavigate()
   const [records, setRecords] = useState<PatientRecord[]>([])
   const [stats, setStats] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
   const { user } = useAuth()
 
   useEffect(() => {
-    patientsApi.findAll().then(setRecords).catch(console.error)
-    dashboardApi.getDashboard().then(setStats).catch(console.error)
+    setLoading(true)
+    Promise.all([
+      patientsApi.findAll().then(setRecords),
+      dashboardApi.getDashboard().then(setStats),
+    ]).catch(console.error).finally(() => setLoading(false))
   }, [])
+
+  if (loading) return <div className="container" style={{ marginTop: "2rem" }}><div className="loading"><div className="spinner"></div>Chargement...</div></div>
 
   const myRecords = records.filter((r) => r.createdById === user?.id)
   const recent = [...records].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, 5)
@@ -116,11 +122,17 @@ function InfirmierDashboard() {
   const navigate = useNavigate()
   const [records, setRecords] = useState<PatientRecord[]>([])
   const [stats, setStats] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    patientsApi.findAll().then(setRecords).catch(console.error)
-    dashboardApi.getDashboard().then(setStats).catch(console.error)
+    setLoading(true)
+    Promise.all([
+      patientsApi.findAll().then(setRecords),
+      dashboardApi.getDashboard().then(setStats),
+    ]).catch(console.error).finally(() => setLoading(false))
   }, [])
+
+  if (loading) return <div className="container" style={{ marginTop: "2rem" }}><div className="loading"><div className="spinner"></div>Chargement...</div></div>
 
   return (
     <div className="container">
@@ -171,12 +183,16 @@ function AgentDashboard() {
   const navigate = useNavigate()
   const [records, setRecords] = useState<PatientRecord[]>([])
   const [stats, setStats] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
   const [showCreate, setShowCreate] = useState(false)
-  const [form, setForm] = useState({ nom: "", prenom: "", dateNaissance: "", sexe: "", telephone: "", adresse: "", profession: "", npi: "", consentGiven: false })
+  const [form, setForm] = useState({ nom: "", prenom: "", dateNaissance: "", sexe: "", telephone: "", adresse: "", profession: "", consentGiven: false })
 
   useEffect(() => {
-    patientsApi.findAll().then(setRecords).catch(console.error)
-    dashboardApi.getDashboard().then(setStats).catch(console.error)
+    setLoading(true)
+    Promise.all([
+      patientsApi.findAll().then(setRecords),
+      dashboardApi.getDashboard().then(setStats),
+    ]).catch(console.error).finally(() => setLoading(false))
   }, [])
 
   const handleCreate = async (e: React.FormEvent) => {
@@ -185,13 +201,15 @@ function AgentDashboard() {
       const record = await patientsApi.create(form)
       setRecords([...records, record])
       setShowCreate(false)
-      setForm({ nom: "", prenom: "", dateNaissance: "", sexe: "", telephone: "", adresse: "", profession: "", npi: "", consentGiven: false })
+      setForm({ nom: "", prenom: "", dateNaissance: "", sexe: "", telephone: "", adresse: "", profession: "", consentGiven: false })
     } catch (err) {
       console.error(err)
     }
   }
 
   const myRecords = records.filter((r) => r.createdById === user?.id)
+
+  if (loading) return <div className="container" style={{ marginTop: "2rem" }}><div className="loading"><div className="spinner"></div>Chargement...</div></div>
 
   return (
     <div className="container">
@@ -240,10 +258,7 @@ function AgentDashboard() {
             <label>Adresse</label>
             <input value={form.adresse} onChange={(e) => setForm({ ...form, adresse: e.target.value })} />
           </div>
-          <div className="form-group">
-            <label>NPI (ANIP Bénin) <span className="optional-badge">facultatif</span></label>
-            <input value={form.npi} onChange={(e) => setForm({ ...form, npi: e.target.value })} placeholder="Numéro Personnel d'Identification" />
-          </div>
+
           <div className="form-group">
             <label>
               <input type="checkbox" checked={form.consentGiven} onChange={(e) => setForm({ ...form, consentGiven: e.target.checked })} />
@@ -272,10 +287,14 @@ function AgentDashboard() {
 
 function AdministratifDashboard() {
   const [stats, setStats] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    dashboardApi.getDashboard().then(setStats).catch(console.error)
+    setLoading(true)
+    dashboardApi.getDashboard().then(setStats).catch(console.error).finally(() => setLoading(false))
   }, [])
+
+  if (loading) return <div className="container" style={{ marginTop: "2rem" }}><div className="loading"><div className="spinner"></div>Chargement...</div></div>
 
   return (
     <div className="container">
@@ -302,10 +321,14 @@ function PatientDashboardView() {
   const navigate = useNavigate()
   const [records, setRecords] = useState<PatientRecord[]>([])
   const [stats, setStats] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    patientsApi.findAll().then(setRecords).catch(console.error)
-    dashboardApi.getDashboard().then(setStats).catch(console.error)
+    setLoading(true)
+    Promise.all([
+      patientsApi.findAll().then(setRecords),
+      dashboardApi.getDashboard().then(setStats),
+    ]).catch(console.error).finally(() => setLoading(false))
   }, [])
 
   return (
@@ -325,6 +348,9 @@ function PatientDashboardView() {
         </div>
       </div>
 
+      {loading ? (
+        <div className="loading"><div className="spinner"></div>Chargement de vos dossiers...</div>
+      ) : (
       <div className="patient-grid">
         {records.map((r) => (
           <div key={r.id} className="card patient-card" onClick={() => navigate(`/share/${r.id}`)}>
@@ -337,6 +363,7 @@ function PatientDashboardView() {
         ))}
         {records.length === 0 && <p className="empty-state">Aucun dossier pour le moment.</p>}
       </div>
+      )}
     </div>
   )
 }

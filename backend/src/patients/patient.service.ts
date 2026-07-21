@@ -29,13 +29,12 @@ export class PatientService {
     private readonly encryptionService: EncryptionService,
   ) {}
 
-  private encryptPatientData(dto: { nom?: string; prenom?: string; adresse?: string; telephone?: string; npi?: string }): string | undefined {
+  private encryptPatientData(dto: { nom?: string; prenom?: string; adresse?: string; telephone?: string }): string | undefined {
     const sensitive: Record<string, string> = {}
     if (dto.nom !== undefined) sensitive.nom = dto.nom
     if (dto.prenom !== undefined) sensitive.prenom = dto.prenom
     if (dto.adresse !== undefined) sensitive.adresse = dto.adresse
     if (dto.telephone !== undefined) sensitive.telephone = dto.telephone
-    if (dto.npi !== undefined) sensitive.npi = dto.npi
     if (Object.keys(sensitive).length === 0) return undefined
     return this.encryptionService.encrypt(JSON.stringify(sensitive))
   }
@@ -48,7 +47,7 @@ export class PatientService {
         if (decrypted.prenom !== undefined) record.prenom = decrypted.prenom
         if (decrypted.adresse !== undefined) record.adresse = decrypted.adresse
         if (decrypted.telephone !== undefined) record.telephone = decrypted.telephone
-        if (decrypted.npi !== undefined) (record as any).npi = decrypted.npi
+
       } catch {}
     }
     return record
@@ -91,7 +90,6 @@ export class PatientService {
   async findMine(userId: string): Promise<PatientRecord[]> {
     const records = await this.patientRepository.find({
       where: { userId, isActive: true },
-      relations: ["clinicalEntries"],
       order: { createdAt: "DESC" },
     })
     return records.map((r) => this.decryptPatientRecord(r))
@@ -108,7 +106,6 @@ export class PatientService {
 
     const [data, total] = await this.patientRepository.findAndCount({
       where,
-      relations: ["clinicalEntries"],
       skip,
       take: limit,
       order: { createdAt: "DESC" },

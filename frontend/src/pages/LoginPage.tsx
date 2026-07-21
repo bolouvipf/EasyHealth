@@ -7,17 +7,21 @@ export default function LoginPage() {
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState("")
+  const [loading, setLoading] = useState(false)
   const { login } = useAuth()
   const navigate = useNavigate()
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     setError("")
+    setLoading(true)
     try {
       await login(email, password)
       navigate("/dashboard")
     } catch (err: any) {
       setError(err.response?.data?.message || "Erreur de connexion")
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -55,7 +59,7 @@ export default function LoginPage() {
               </button>
             </div>
           </div>
-          <button type="submit" className="btn btn-primary btn-block">Se connecter</button>
+          <button type="submit" className={`btn btn-primary btn-block${loading ? " btn-loading" : ""}`} disabled={loading}>Se connecter</button>
         </form>
         <p className="auth-link">
           <Link to="/forgot-password">Mot de passe oublié ?</Link>

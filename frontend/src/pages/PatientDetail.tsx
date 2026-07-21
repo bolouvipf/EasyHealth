@@ -36,16 +36,19 @@ export default function PatientDetail() {
   const [activeSpecialty, setActiveSpecialty] = useState<string | null>(null)
   const [expandedSpecialties, setExpandedSpecialties] = useState<Set<string>>(new Set())
 
+  const [loadingEntries, setLoadingEntries] = useState(true)
+
   useEffect(() => {
     if (!id) return
+    setLoadingEntries(true)
     patientsApi.findOne(id).then((r) => {
       setRecord(r)
       setForm(r)
     }).catch(console.error)
-    patientsApi.getClinicalEntries(id).then(setEntries).catch(console.error)
+    patientsApi.getClinicalEntries(id).then(setEntries).catch(console.error).finally(() => setLoadingEntries(false))
   }, [id])
 
-  if (!record) return <div className="loading">Chargement...</div>
+  if (!record) return <div className="loading"><div className="spinner"></div>Chargement du dossier...</div>
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -96,7 +99,6 @@ export default function PatientDetail() {
     { key: "dateNaissance", label: "Date de naissance", type: "date" },
     { key: "sexe", label: "Sexe" },
     { key: "groupeSanguin", label: "Groupe sanguin" },
-    { key: "npi", label: "NPI (ANIP Bénin)" },
     { key: "telephone", label: "Téléphone" },
     { key: "adresse", label: "Adresse" },
     { key: "profession", label: "Profession" },
@@ -178,7 +180,9 @@ export default function PatientDetail() {
           </form>
         )}
 
-        {entries.length === 0 ? (
+        {loadingEntries ? (
+          <div className="loading"><div className="spinner"></div>Chargement des entrées...</div>
+        ) : entries.length === 0 ? (
           <p className="empty-state" style={{ background: "var(--white)", borderRadius: "var(--radius-card)", border: "1px solid var(--border-mist)" }}>
             Aucune entrée clinique pour ce dossier.
           </p>

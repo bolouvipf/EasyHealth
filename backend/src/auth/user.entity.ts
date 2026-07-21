@@ -20,6 +20,7 @@ export class User {
   id: string
 
   @Column({ unique: true })
+  @Index()
   email: string
 
   @Column()
@@ -33,6 +34,7 @@ export class User {
   prenom: string
 
   @Column({ type: "simple-enum", enum: UserRole })
+  @Index()
   role: UserRole
 
   @Column({ nullable: true })
